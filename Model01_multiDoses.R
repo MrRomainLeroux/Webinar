@@ -61,7 +61,7 @@ MyDesign= Design("MyDesign")
 brasTest = Arm( name="Bras test", arm_size = 12 )
 
 brasTest = addSampling( brasTest, SamplingTimes( outcome = "RespPK1",
-                                                  sample_time = c( 5, 24, 48 ,72, 168 ) ) )
+                                                 sample_time = c( 5, 24, 48 ,72, 168 ) ) )
 
 # sampling times c( 5, 24, 48, 72 )
 # brasTest = addAdministration( brasTest, Administration( outcome = "RespPK1",
@@ -71,8 +71,8 @@ brasTest = addSampling( brasTest, SamplingTimes( outcome = "RespPK1",
 # sampling times c( 5, 23, 47, 71 )
 # amelioration des RSE
 brasTest = addAdministration( brasTest, Administration( outcome = "RespPK1",
-                                                         time_dose = c( 5, 23, 47, 71 ),
-                                                         amount_dose = c( 100, 1000, 1000, 1000  ) ) )
+                                                        time_dose = c( 5, 23, 47, 71 ),
+                                                        amount_dose = c( 100, 1000, 1000, 1000  ) ) )
 
 # *****************************************************************
 # Optimization
@@ -88,15 +88,18 @@ brasTest = addAdministration( brasTest, Administration( outcome = "RespPK1",
 
 # set optimization constraint
 samplingBoundsConstraint = SamplingConstraint( response = "RespPK1", continuousSamplingTimes = list( c( 0, 6 ),
-                                                                                                      c( 23, 24 ),
-                                                                                                      c( 46, 48 ),
-                                                                                                      c( 69, 96 ),
-                                                                                                      c( 72, 168 ) ) )
-Constr1 = DesignConstraint( )
-Constr1 = addSamplingConstraint( Constr1, samplingBoundsConstraint )
-MyProject = setConstraint(MyProject,Constr1)
+                                                                                                     c( 23, 24 ),
+                                                                                                     c( 46, 48 ),
+                                                                                                     c( 69, 72 ),
+                                                                                                     c( 96, 168 ) ) )
 
-# add design to the project
+Constr1 = DesignConstraint()
+
+Constr1 = addSamplingConstraint( Constr1, samplingBoundsConstraint )
+brasTest<- addSamplingConstraints( brasTest, Constr1 )
+
+MyProject = setConstraint( MyProject,Constr1 )
+
 MyDesign = addArm( MyDesign, brasTest )
 MyProject = addDesign( MyProject, MyDesign )
 
@@ -112,15 +115,41 @@ print( RSE )
 #plotResponse = plotResponse( evaluationPop, plotOptions = list( ) )
 #print( plotResponse )
 
-# run optimization
+## run optimization
+
+# simplex algorithm
 simplexOptimizer = SimplexAlgorithm( pct_initial_simplex_building = 20,
-                                      max_iteration = 5000,
-                                      tolerance = 1e-6 )
+                                     max_iteration = 5000,
+                                     tolerance = 1e-6 )
 
-optimization_populationFIM = OptimizeDesign( MyProject , simplexOptimizer, PopulationFim() )
+optimizationSimplexPopulationFIM = OptimizeDesign( MyProject , simplexOptimizer, PopulationFim() )
 
-show( optimization_populationFIM )
+show( optimizationSimplexPopulationFIM )
 
+
+# PSO algorithm
+# fail !
+psoOptimizer = PSOAlgorithm( maxIteration = 500,
+                             populationSize = 50,
+                             personalLearningCoefficient = 2.05,
+                             globalLearningCoefficient = 2.05,
+                             showProcess = TRUE )
+
+optimizationPSOPopulationFIM = OptimizeDesign( MyProject, psoOptimizer, PopulationFim() )
+
+show( optimizationPSOPopulationFIM )
+
+
+# PGBO algorithm
+pgboOptimizer = PGBOAlgorithm( N = 200,
+                               muteEffect = 0.5,
+                               maxIteration = 1000,
+                               seed = 42,
+                               showProcess = TRUE )
+
+optimizationPGBOPopulationFIM = OptimizeDesign( MyProject, pgboOptimizer, PopulationFim() )
+
+show( optimizationPGBOPopulationFIM )
 
 
 ##########################################################################################
