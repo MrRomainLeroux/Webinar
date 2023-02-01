@@ -92,10 +92,12 @@ samplingBoundsConstraint = SamplingConstraint( response = "RespPK1", continuousS
                                                                                                      c( 46, 48 ),
                                                                                                      c( 69, 72 ),
                                                                                                      c( 96, 168 ) ) )
+samplingMinimalDelayConstraintRespPK1 <- SamplingConstraint( response = "RespPK1", min_delay = 1 )
 
 Constr1 = DesignConstraint()
-
 Constr1 = addSamplingConstraint( Constr1, samplingBoundsConstraint )
+Constr1 = addSamplingConstraint( Constr1, samplingMinimalDelayConstraintRespPK1 )
+
 brasTest<- addSamplingConstraints( brasTest, Constr1 )
 
 MyProject = setConstraint( MyProject,Constr1 )
@@ -128,9 +130,8 @@ show( optimizationSimplexPopulationFIM )
 
 
 # PSO algorithm
-# fail !
 psoOptimizer = PSOAlgorithm( maxIteration = 500,
-                             populationSize = 50,
+                             populationSize = 100,
                              personalLearningCoefficient = 2.05,
                              globalLearningCoefficient = 2.05,
                              showProcess = TRUE )
