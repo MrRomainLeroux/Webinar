@@ -1,10 +1,19 @@
 
+# ******************************************************************
+
+# Example 01 from PopED
+
+# ******************************************************************
+
+# ******************************************************************
+# Evaluation
+# ******************************************************************
 
 ### Create PFIM project
-MyProject<-PFIMProject(name = "PFIM_model_01")
+MyProject=PFIMProject(name = "PFIM_model_01")
 
 ### Create the statistical model
-MyStatisticalModel<-StatisticalModel()
+MyStatisticalModel=StatisticalModel()
 
 Wt = 32
 WtCl = 0.75
@@ -46,31 +55,74 @@ MyStatisticalModel = addResponse( MyStatisticalModel, Response( "RespPK1", Combi
 MyProject = defineStatisticalModel( MyProject, MyStatisticalModel )
 
 ### Create a design
-MyDesign<- Design("MyDesign")
+MyDesign= Design("MyDesign")
 
 ### For each arm create and add the sampling times for each response
-brasTest <- Arm( name="Bras test", arm_size = 12 )
+brasTest = Arm( name="Bras test", arm_size = 12 )
 
-brasTest <- addSampling( brasTest, SamplingTimes( outcome = "RespPK1",
+brasTest = addSampling( brasTest, SamplingTimes( outcome = "RespPK1",
                                                   sample_time = c( 5, 24, 48 ,72, 168 ) ) )
 
-brasTest <- addAdministration( brasTest, Administration( outcome = "RespPK1",
-                                                         time_dose = c( 5, 24, 48, 72 ),
-                                                         amount_dose = c( 1000, 1000, 1000, 1000  ) ) )
+# sampling times c( 5, 24, 48, 72 )
+# brasTest = addAdministration( brasTest, Administration( outcome = "RespPK1",
+#                                                          time_dose = c( 5, 24, 48, 72 ),
+#                                                          amount_dose = c( 100, 1000, 1000, 1000  ) ) )
 
+# sampling times c( 5, 23, 47, 71 )
+# amelioration des RSE
+brasTest = addAdministration( brasTest, Administration( outcome = "RespPK1",
+                                                         time_dose = c( 5, 23, 47, 71 ),
+                                                         amount_dose = c( 100, 1000, 1000, 1000  ) ) )
 
-### Add the arm to the design
-MyDesign <- addArm( MyDesign, brasTest )
+# *****************************************************************
+# Optimization
+# Simplex algorithm
+# PFIM5 : 1 response
+# *****************************************************************
 
-### Add the design to the project
-MyProject <- addDesign( MyProject, MyDesign )
+# minxt = c(0, c(rep(23, 3), 96))
+# maxxt = c(6, c(rep(24, 3), 168)
 
-evaluationPop <- EvaluatePopulationFIM( MyProject )
+# minxt = c( 0, 23, 46, 69, 96 )
+# maxxt = c( 6, 24, 48, 72, 168 )
+
+# set optimization constraint
+samplingBoundsConstraint = SamplingConstraint( response = "RespPK1", continuousSamplingTimes = list( c( 0, 6 ),
+                                                                                                      c( 23, 24 ),
+                                                                                                      c( 46, 48 ),
+                                                                                                      c( 69, 96 ),
+                                                                                                      c( 72, 168 ) ) )
+Constr1 = DesignConstraint( )
+Constr1 = addSamplingConstraint( Constr1, samplingBoundsConstraint )
+MyProject = setConstraint(MyProject,Constr1)
+
+# add design to the project
+MyDesign = addArm( MyDesign, brasTest )
+MyProject = addDesign( MyProject, MyDesign )
+
+# evaluation of the population FIM
+evaluationPop = EvaluatePopulationFIM( MyProject )
 show(evaluationPop)
 
-plotResponse = plotResponse( evaluationPop, plotOptions = list( ) )
-print( plotResponse )
+# RSE
+RSE = plotRSE( evaluationPop )
+print( RSE )
+
+# model response
+#plotResponse = plotResponse( evaluationPop, plotOptions = list( ) )
+#print( plotResponse )
+
+# run optimization
+simplexOptimizer = SimplexAlgorithm( pct_initial_simplex_building = 20,
+                                      max_iteration = 5000,
+                                      tolerance = 1e-6 )
+
+optimization_populationFIM = OptimizeDesign( MyProject , simplexOptimizer, PopulationFim() )
+
+show( optimization_populationFIM )
 
 
-########################################################################################################################################################
 
+##########################################################################################
+# END Example
+##########################################################################################

@@ -75,6 +75,10 @@ library(rbabylon)
 theme_set(theme_bw())
 ```
 
+# !! package PopED
+https://mpn.metworx.com/packages/rbabylon/0.7.0/index.html
+impossible à installer
+
 # Introducing our example
 
 Mockdrozaline has been studied in adult subjects, and we now must design a study in pediatric patients.  The primary objective is to evaluate the PK in this new population, but PK sampling is necessarily sparse.  Our mission is to ensure that these samples are timed such that we can sufficiently estimate the PK parameters in pediatric patients.
@@ -268,7 +272,7 @@ poped_db <- create.poped.database(
 We've covered the functions used in the first 3 arguments.  Let's break down the rest.
 
 ```{r eval=FALSE}
-bpop = c(CL = 10, V = 100, KA = 0.25, WT_CL = 0.75, WT_V = 1), 
+bpop = c(CL = 10, V = 100, KA = 0.25, WT_CL = 0.75, WT_V = 1)
 ```
 
 ************************************************************************************************************
@@ -280,7 +284,7 @@ bpop = mu
 These are our current best estimates of the fixed effect parameters (`THETA`s).
 
 ```{r eval=FALSE}
-notfixed_bpop = c(1, 1, 1, 0, 0),
+notfixed_bpop = c(1, 1, 1, 0, 0)
 ```
 
 ************************************************************************************************************
@@ -292,7 +296,7 @@ notfixed_bpop = c(1, 1, 1, 0, 0),
 For this example, we're assuming that our weight covariate parameters are fixed in the model.  We need to tell `PopED` they're not not fixed (yes, that's a double negative).  Each element of this vector corresponds to an element of `bpop`.  We use `1` to denote "not fixed" (estimated) and `0` to denote "not not fixed" (not estimated).
 
 ```{r eval=FALSE}
-d = c(CL = 0.08, V = 0.1, KA = 0.2), 
+d = c(CL = 0.08, V = 0.1, KA = 0.2)
 ```
 
 These are the diagonal elements of the IIV covariance matrix (`OMEGA`).  `covd` could be used for off-diagonal elements, but we're assuming those are all zero here.
@@ -304,14 +308,14 @@ omega in model parameters
 ************************************************************************************************************
 
 ```{r eval=FALSE}
-sigma = c(0.05, 1),
+sigma = c(0.05, 1)
 ```
 
 Diagonal elements of the residual covariance matrix.
 
 ```{r eval=FALSE}
-m = 1,
-groupsize = 12,
+m = 1
+groupsize = 12
 ```
 
 ************************************************************************************************************
@@ -327,14 +331,14 @@ arm1 = Arm( name, arm_size, cond_init )
 `m` is the number of groups, with `groupsize` subjects in each group.  We could use multiple groups to define multiple arms of a study, or to assign different designs to different subjects.
 
 ```{r eval=FALSE}
-xt = c(5, c(rep(24, 3), 168)),
+xt = c(5, c(rep(24, 3), 168))
 ```
 
 Our initial sampling design.
 
 ```{r eval=FALSE}
-minxt = c(0, c(rep(23, 3), 96)),
-maxxt = c(6, c(rep(24, 3), 168)),
+minxt = c(0, c(rep(23, 3), 96))
+maxxt = c(6, c(rep(24, 3), 168))
 ```
 
 These define the design space for our sampling times.  When optimizing, potential sampling times will be evaluated between these bounds.
@@ -347,7 +351,7 @@ define in SamplingTimes( outcome sample_time, initialTime )
 
 *****************************************************
 ```{r eval=FALSE}
-model_switch = c(1, rep(2, 4)),
+model_switch = c(1, rep(2, 4))
 ```
 
 ************************************************************************************************************
@@ -419,12 +423,8 @@ get_rse(FIM, poped_db)
 The RSEs are crazy high, which suggests that the model is not identifiable.  A slight tweak to a single timepoint (increasing the number of support points) may help.
 
 
-
-
-# ******************************************************************************************
-# END TEST1
-# ******************************************************************************************
-
+# ******************************************************************************************************************
+# ******************************************************************************************************************
 
 ```{r}
 poped_db2 <- create.poped.database(
@@ -456,6 +456,9 @@ saveRDS(output, "opt1.rds")
 output <- readRDS("opt1.rds")
 summary(output)
 ```
+
+# ******************************************************************************************************************
+# ******************************************************************************************************************
 
 Better, but still not good enough.
 
