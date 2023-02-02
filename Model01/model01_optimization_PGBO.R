@@ -80,10 +80,9 @@ brasTest = addAdministration( brasTest, Administration( outcome = "RespPK1",
 
 # set optimization constraint
 samplingBoundsConstraint = SamplingConstraint( response = "RespPK1", continuousSamplingTimes = list( c( 0, 6 ),
-                                                                                                     c( 72, 272 ),
-                                                                                                     c( 96, 96 ),
-                                                                                                     c( 120, 120+168 )))#,
-                                                                                                     #c( 96, 168 ) ) )
+                                                                                                     c( 71, 72 ),
+                                                                                                     c( 95, 96 ),
+                                                                                                     c( 120 + 96, 120 + 168 )))
 Constr1 = DesignConstraint()
 Constr1 = addSamplingConstraint( Constr1, samplingBoundsConstraint )
 brasTest = addSamplingConstraints( brasTest, Constr1 )
@@ -98,7 +97,7 @@ MyProject = addDesign( MyProject, MyDesign )
 # PGBO algorithm
 pgboOptimizer = PGBOAlgorithm( N = 200,
                                muteEffect = 0.25,
-                               maxIteration = 1000,
+                               maxIteration = 100,
                                seed = 42,
                                showProcess = TRUE )
 

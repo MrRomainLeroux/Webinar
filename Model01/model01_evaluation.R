@@ -1,4 +1,7 @@
 
+## https://metrumrg.com/course/a-gentle-introduction-to-optimaldesign-for-pharmacometric-models/
+
+
 # ******************************************************************
 
 # Example 01 from PopED
