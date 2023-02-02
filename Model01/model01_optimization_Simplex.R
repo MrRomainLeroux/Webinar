@@ -58,25 +58,19 @@ MyDesign= Design("MyDesign")
 brasTest = Arm( name="Bras test", arm_size = 12 )
 
 brasTest = addSampling( brasTest, SamplingTimes( outcome = "RespPK1",
-                                                 sample_time = c( 5, 24, 48 ,72, 168 ) ) )
+                                                 sample_time = c( 5, 72, 96 ,120 ) ) )
 
-# sampling times c( 5, 24, 48, 72 )
-# brasTest = addAdministration( brasTest, Administration( outcome = "RespPK1",
-#                                                          time_dose = c( 5, 24, 48, 72 ),
-#                                                          amount_dose = c( 100, 1000, 1000, 1000  ) ) )
-
-# sampling times c( 5, 23, 47, 71 )
-# amelioration des RSE
 brasTest = addAdministration( brasTest, Administration( outcome = "RespPK1",
-                                                        time_dose = c( 5, 23, 47, 71 ),
-                                                        amount_dose = c( 100, 1000, 1000, 1000  ) ) )
+                                                        time_dose = c( 0, 24, 48, 72,96 ),
+                                                        amount_dose = c( 10000, 10000, 10000, 10000,10000 ) ) )
+
 
 # set optimization constraint
 samplingBoundsConstraint = SamplingConstraint( response = "RespPK1", continuousSamplingTimes = list( c( 0, 6 ),
-                                                                                                     c( 23, 24 ),
-                                                                                                     c( 46, 48 ),
-                                                                                                     c( 69, 72 ),
-                                                                                                     c( 96, 168 ) ) )
+                                                                                                     c( 71, 72 ),
+                                                                                                     c( 95, 96 ),
+                                                                                                     c( 119, 120 )))#,
+# c( 120+96, 120+168 ) ) )
 Constr1 = DesignConstraint()
 Constr1 = addSamplingConstraint( Constr1, samplingBoundsConstraint )
 brasTest = addSamplingConstraints( brasTest, Constr1 )

@@ -17,7 +17,7 @@ MyStatisticalModel=StatisticalModel()
 #MyPKModel = ModelEquations( list( "RespPK1" = expression( ( dose_RespPK1 * ka/(V * (ka - Cl/V))) * (exp(-Cl/V *t) - exp(-ka * t ) ) ) ) )
 
 # constant parameters
-Wt = 32
+Wt = 70
 WtCl = 0.75
 WtV = 1
 
@@ -51,7 +51,8 @@ MyStatisticalModel = defineParameter( MyStatisticalModel, pV )
 MyStatisticalModel = defineParameter( MyStatisticalModel, pCl )
 
 # Create and add the responses to the statistical model
-MyStatisticalModel = addResponse( MyStatisticalModel, Response( "RespPK1", Combined1( sigma_inter = 1.0, sigma_slope = 0.05 ) ) )
+MyStatisticalModel = addResponse( MyStatisticalModel, Response( "RespPK1",
+                                                                Combined1( sigma_inter = 1.0, sigma_slope = 0.05 ) ) )
 
 # Finaly assign the statistical model to the project
 MyProject = defineStatisticalModel( MyProject, MyStatisticalModel )
@@ -60,29 +61,48 @@ MyProject = defineStatisticalModel( MyProject, MyStatisticalModel )
 MyDesign= Design("MyDesign")
 
 # For each arm create and add the sampling times for each response
-brasTest = Arm( name="Bras test", arm_size = 12 )
+brasTest = Arm( name="Bras test", arm_size = 10 )
 
-brasTest = addSampling( brasTest, SamplingTimes( outcome = "RespPK1",
-                                                 sample_time = c( 5, 24, 48 ,72, 168 ) ) )
+#brasTest = addSampling( brasTest, SamplingTimes( outcome = "RespPK1",
+#                                                 sample_time = c( 1, 24, 48 , 96 ) ) )
+# μ_ka              0.25  0.04531979  18.12792
 
-# sampling times c( 5, 24, 48, 72 )
-# brasTest = addAdministration( brasTest, Administration( outcome = "RespPK1",
-#                                                          time_dose = c( 5, 24, 48, 72 ),
-#                                                          amount_dose = c( 100, 1000, 1000, 1000  ) ) )
 
-# sampling times c( 5, 23, 47, 71 )
-# amelioration des RSE
+#brasTest = addSampling( brasTest, SamplingTimes( outcome = "RespPK1",
+#                                                 sample_time = c( 4, 24, 48 ,96 ) ) )
+#μ_ka              0.25  0.05271620  21.08648
+
+
+#brasTest = addSampling( brasTest, SamplingTimes( outcome = "RespPK1",
+#                                                 sample_time = c( 6, 24, 48 ,96 ) ) )
+#μ_ka              0.25  0.05919378  23.67751
+
+
+#brasTest = addSampling( brasTest, SamplingTimes( outcome = "RespPK1",
+#                                                sample_time = c( 12, 24, 48 ,96 ) ) )
+#μ_ka              0.25  0.08969702  35.87881
+
+
+
+
 brasTest = addAdministration( brasTest, Administration( outcome = "RespPK1",
-                                                        time_dose = c( 5, 23, 47, 71 ),
-                                                        amount_dose = c( 100, 1000, 1000, 1000  ) ) )
+                                                          time_dose = c( 0 ),
+                                                          amount_dose = c( 10000 ) ) )
 
-# evaluation of the population FIM
-evaluationPop = EvaluatePopulationFIM( MyProject )
+MyDesign <- addArm( MyDesign, brasTest )
+### Add the design to the project
+MyProject <- addDesign( MyProject, MyDesign )
+
+# Evaluation of the Design
+evaluationPop <- EvaluatePopulationFIM( MyProject )
+
 show( evaluationPop )
 
+
+
 # RSE
-RSE = plotRSE( evaluationPop )
-print( RSE )
+#RSE = plotRSE( evaluationPop )
+#print( RSE )
 
 # model response
 plotResponse = plotResponse( evaluationPop, plotOptions = list( ) )
