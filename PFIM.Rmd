@@ -1,0 +1,151 @@
+---
+title: "Design evaluation and optimization with PFIM5.0"
+fig: no crop
+geometry: left=1mm, right=1mm, top=1mm, bottom=1mm, asymmetric
+indent: TRUE
+output:
+  html_document:
+    df_print: paged
+    fig_caption: yes
+    output: 
+    highlight: textmate
+  word_document: default
+  pdf_document: default
+header-includes: 
+    - \usepackage{placeins}
+    - \usepackage{indentfirst}
+    - \usepackage{setspace}\doublespacing
+    - \usepackage{lineno}
+    - \linenumbers
+author: ""
+date: "`r paste( 'Date:' , Sys.Date())`"
+---
+
+```{r setup, include=FALSE, eval=TRUE}
+knitr::opts_chunk$set(echo = TRUE,fig.retina = 2, fig.align="center")
+options(kableExtra.latex.load_packages = FALSE)
+```
+
+# Package PFIM5
+
+- implemented using object-oriented programming
+- objects have clear definition including class and argument definitions, inheritance, as well as argument checking, instantiation and implementation methods. 
+
+- The version of this package is available from the Comprehensive R Archive Network at https://cran.r-project.org/web/packages/PFIM/index.html with additional detailed examples for design evaluation and optimization:
+
+  https://cran.r-project.org/web/packages/PFIM/vignettes/Example01.html
+  
+  https://cran.r-project.org/web/packages/PFIM/vignettes/Example02.html
+
+# PFIM setup
+
+PFIM requires the following objects to define a model:
+
+ - **ModelODEquations()**: the structural model
+ - **ModelParameter**, to define a model parameter
+ - **Combined1()**: the model error
+ 
+The PFIM combines together these objects through a pipeline to evaluate and optimize design.
+
+## The structural model: ModelODEquations()
+
+The structural model is defined with the object **ModelODEquations( list(), list() )**:
+
+- The first list defines the responses associated to the model responses.
+- The second list defines the ODE equations of the model for each variable.
+
+```{r ModelODEquations, eval=FALSE, echo=TRUE}
+MyModelEquations = ModelODEquations(
+
+  # list for the responses
+  list( RespPK = expression( C1 ),
+        RespPD = expression( C2 ) ),
+
+  # list for the derivatives
+  list( "Deriv_C1" = expression( dose_RespPK * ka / V  * exp( -ka * t ) - Cl * C1/V  ),
+        "Deriv_C2" = expression( V*C1/Vm - Clm/Vm * C2 ) ) )
+```
+
+## The model parameter: ModelParameter()
+
+Model parameters are defined with the object **ModelParameter( name, mu, omega, distribution, fixedMu, fixedOmega )** :
+
+- name: a character string giving the name of the parameter
+- mu: a numeric giving the value the fixed effects mu
+- omega: a numeric giving the value of the variance effects omega
+- distribution: the distribution of the parameters: LogNormalDistribution() for Log-Normal distribution or NormalDistribution() for a normal distribution
+- fixedMu, fixedOmega: Boolean for estimating or not the fixed and random effects
+
+```{r ModelParameter, eval=FALSE, echo=TRUE}
+pka = ModelParameter( "ka", 
+                      mu = 1.24,
+                      omega =sqrt ( 0 ),
+                      distribution = LogNormalDistribution(),
+                      fixedMU = FALSE, 
+                      fixedOmega = FALSE)
+```
+
+## The residual error model
+
+Additive and proportional error model, are defined with the object **Combined1( sigma_inter, sigma_slope )**:
+
+- sigma_inter: parameter for the additive part
+- sigma_slope: parameter for the proportional part
+
+```{r ModelError, eval=FALSE, echo=TRUE}
+ModelErrorResponsePK = Combined1( sigma_inter = 0.6, sigma_slope = 0.07 )
+```
+
+##  The response 
+
+- The model response is defined with the object **Response( name, model_error )** :
+  - name: a string giving the name of the response
+  - model_error: the model error of to the response   
+
+```{r Response, eval=FALSE, echo=TRUE}
+RespPK = Response( "RespPK", ModelErrorResponsePK )
+```
+
+##  The arm
+
+- The arm is defined with the object **Arm( name, arm_size, cond_init )**:
+  - name: a string for the name of the arm
+  - arm_size: the size of the arm
+  - condit_init: a list giving the initial condition of the model variables
+
+```{r Arm, eval=FALSE, echo=TRUE}
+arm1 = Arm( name = "Bras test", arm_size = 20, cond_init = list( "C1" = 0, "C2" = 0 ) )
+```
+
+##  The sampling times
+
+- The sampling times are defined with the object **SamplingTimes( outcome, sample_time, initialTime )**
+  - outcome: a string for the name of the response
+  - sample_time: the vector of the sampling times
+  - initialTime: values giving the initial sampling time
+  
+```{r SamplingTimes, eval=FALSE, echo=TRUE}
+samplingTimesRespPK = SamplingTimes( outcome = "RespPK", 
+                                     sample_time = c( 0.5, 170, 180, 192 ), initialTime = 0 )
+```
+
+##  The administration 
+
+- The administration is defined with the object **Administration( outcome, time_dose, amount_dose )**
+  - outcome: a string for the name of the response
+  - time_dose: the vector for the time doses
+  - amount_dose: the vector for the amount of doses
+  
+```{r Administration, eval=FALSE, echo=TRUE}
+administrationRespPK = Administration( outcome = "RespPK",
+                                       time_dose = 24, 
+                                       amount_dose = c(200) )
+```
+##  The design
+
+- The design is defined with the object  **Design( name )**
+  - name: a string for the name of the design
+
+```{r Design, eval=FALSE, echo=TRUE}
+MyDesign = Design( "design1" )
+```
