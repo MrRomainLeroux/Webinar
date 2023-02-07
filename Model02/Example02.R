@@ -5,7 +5,8 @@ MyProject=PFIMProject(name = "PopED_Example02")
 
 MyStatisticalModel = StatisticalModel()
 
-#MyStatisticalModel = setParametersOdeSolver( MyStatisticalModel, list( .relStep = 1e-9 ) )
+# !! need to adjust .relStep for gradient computing
+MyStatisticalModel = setParametersOdeSolver( MyStatisticalModel, list( atol=1e-8, rtol=1e-8, .relStep = 1e-1 ) )
 
 ### model equations
 
@@ -55,7 +56,6 @@ MyStatisticalModel = defineParameter( MyStatisticalModel, pV1 )
 
 ### Create and add the responses to the statistical model
 MyStatisticalModel = addResponse( MyStatisticalModel, Response( "RespPK", Proportional( sigma_slope = 0.15 ) ) )
-#MyStatisticalModel = addResponse( MyStatisticalModel, Response( "RespPD", Proportional( sigma_slope = 0.15 ) ) )
 
 ### Finaly assign the statistical model to the project
 MyProject = defineStatisticalModel( MyProject, MyStatisticalModel )
@@ -64,10 +64,14 @@ MyProject = defineStatisticalModel( MyProject, MyStatisticalModel )
 MyDesign= Design("Design")
 
 
-#DOSE = c(0.03, 0.1, 0.3, 1, 3, 10)
-# 6 groups 1/grp/dose
+### For each arm create and add the sampling times & admministration for each response
 
-### For each arm create and add the sampling times for each response
+dose_group1 = 0.03
+dose_group2 = 0.1
+dose_group3 = 0.3
+dose_group4 = 1
+dose_group5 = 3
+dose_group6 = 10
 
 # group 1
 Bras_test_group1 = Arm( name="Bras_test_group1", arm_size = 6 )
@@ -75,7 +79,7 @@ Bras_test_group1 = addSampling( Bras_test_group1, SamplingTimes( outcome = "Resp
                                                                  sample_time = c(c(1, 4)/24, 1, 3, 7, 14, 21) ) )
 Bras_test_group1 = addSampling( Bras_test_group1, SamplingTimes( outcome = "RespPD",
                                                                  sample_time = c(c(1, 4)/24, 1, 3, 7, 14, 21) ) )
-Bras_test_group1 = addAdministration( Bras_test_group1, Administration( outcome = "RespPK", time_dose = c(0), amount_dose = c(1000*0.03) ) )
+Bras_test_group1 = addAdministration( Bras_test_group1, Administration( outcome = "RespPK", time_dose = c(0), amount_dose = 1000*dose_group1 ) )
 Bras_test_group1 = setInitialConditions( Bras_test_group1, list( "C1" = expression( dose_RespPK ), "C2" = 0 ) )
 
 # group 2
@@ -84,7 +88,7 @@ Bras_test_group2 = addSampling( Bras_test_group2, SamplingTimes( outcome = "Resp
                                                                  sample_time = c(c(1, 4)/24, 1, 3, 7, 14, 21) ) )
 Bras_test_group2 = addSampling( Bras_test_group2, SamplingTimes( outcome = "RespPD",
                                                                  sample_time = c(c(1, 4)/24, 1, 3, 7, 14, 21) ) )
-Bras_test_group2 = addAdministration( Bras_test_group2, Administration( outcome = "RespPK", time_dose = c(0), amount_dose = c(1000*0.1) ) )
+Bras_test_group2 = addAdministration( Bras_test_group2, Administration( outcome = "RespPK", time_dose = c(0), amount_dose = 1000*dose_group2 ) )
 Bras_test_group2 = setInitialConditions( Bras_test_group2, list( "C1" = expression( dose_RespPK ), "C2" = 0 ) )
 
 # group 3
@@ -93,7 +97,7 @@ Bras_test_group3 = addSampling( Bras_test_group3, SamplingTimes( outcome = "Resp
                                                                  sample_time = c(c(1, 4)/24, 1, 3, 7, 14, 21) ) )
 Bras_test_group3 = addSampling( Bras_test_group3, SamplingTimes( outcome = "RespPD",
                                                                  sample_time = c(c(1, 4)/24, 1, 3, 7, 14, 21) ) )
-Bras_test_group3 = addAdministration( Bras_test_group3, Administration( outcome = "RespPK", time_dose = c(0), amount_dose = c(1000*0.3) ) )
+Bras_test_group3 = addAdministration( Bras_test_group3, Administration( outcome = "RespPK", time_dose = c(0), amount_dose = 1000*dose_group3 ) )
 Bras_test_group3 = setInitialConditions( Bras_test_group3, list( "C1" = expression( dose_RespPK ), "C2" = 0 ) )
 
 # group 4
@@ -102,7 +106,7 @@ Bras_test_group4 = addSampling( Bras_test_group4, SamplingTimes( outcome = "Resp
                                                                  sample_time = c(c(1, 4)/24, 1, 3, 7, 14, 21) ) )
 Bras_test_group4 = addSampling( Bras_test_group4, SamplingTimes( outcome = "RespPD",
                                                                  sample_time = c(c(1, 4)/24, 1, 3, 7, 14, 21) ) )
-Bras_test_group4 = addAdministration( Bras_test_group4, Administration( outcome = "RespPK", time_dose = c(0), amount_dose = c(1000*1) ) )
+Bras_test_group4 = addAdministration( Bras_test_group4, Administration( outcome = "RespPK", time_dose = c(0), amount_dose = 1000*dose_group4 ) )
 Bras_test_group4 = setInitialConditions( Bras_test_group4, list( "C1" = expression( dose_RespPK ), "C2" = 0 ) )
 
 # group 5
@@ -111,7 +115,7 @@ Bras_test_group5 = addSampling( Bras_test_group5, SamplingTimes( outcome = "Resp
                                                                  sample_time = c(c(1, 4)/24, 1, 3, 7, 14, 21) ) )
 Bras_test_group5 = addSampling( Bras_test_group5, SamplingTimes( outcome = "RespPD",
                                                                  sample_time = c(c(1, 4)/24, 1, 3, 7, 14, 21) ) )
-Bras_test_group5 = addAdministration( Bras_test_group5, Administration( outcome = "RespPK", time_dose = c(0), amount_dose = c(1000*3) ) )
+Bras_test_group5 = addAdministration( Bras_test_group5, Administration( outcome = "RespPK", time_dose = c(0), amount_dose = 1000*dose_group4 ) )
 Bras_test_group5 = setInitialConditions( Bras_test_group5, list( "C1" = expression( dose_RespPK ), "C2" = 0 ) )
 
 # group 6
@@ -120,12 +124,12 @@ Bras_test_group6 = addSampling( Bras_test_group6, SamplingTimes( outcome = "Resp
                                                                  sample_time = c(c(1, 4)/24, 1, 3, 7, 14, 21) ) )
 Bras_test_group6 = addSampling( Bras_test_group6, SamplingTimes( outcome = "RespPD",
                                                                  sample_time = c(c(1, 4)/24, 1, 3, 7, 14, 21) ) )
-Bras_test_group6 = addAdministration( Bras_test_group6, Administration( outcome = "RespPK", time_dose = c(0), amount_dose = c(1000*10) ) )
+Bras_test_group6 = addAdministration( Bras_test_group6, Administration( outcome = "RespPK", time_dose = c(0), amount_dose = 1000*dose_group6 ) )
 Bras_test_group6 = setInitialConditions( Bras_test_group6, list( "C1" = expression( dose_RespPK ), "C2" = 0 ) )
 
 ### Add the arm to the design
-#MyDesign = addArm( MyDesign, Bras_test_group1 )
-#MyDesign = addArm( MyDesign, Bras_test_group2 )
+MyDesign = addArm( MyDesign, Bras_test_group1 )
+MyDesign = addArm( MyDesign, Bras_test_group2 )
 MyDesign = addArm( MyDesign, Bras_test_group3 )
 MyDesign = addArm( MyDesign, Bras_test_group4 )
 MyDesign = addArm( MyDesign, Bras_test_group5 )
