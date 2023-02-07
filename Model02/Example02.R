@@ -146,6 +146,15 @@ plotSE(evaluationPop)
 plotSE(evaluationPop)
 
 
+#bpop = c(CL = 0.5, VMAX = 20, KM = 1.2, V1 = 2.5, Q = 10, V2 = 4),
+
+# bpop[1]   bpop[2]   bpop[3] bpop[4]   bpop[5] bpop[6]   D[1,1]
+# 10.874541 10.660202 7.935122 6.355306 8.894763 3.620234 38.990317
+#
+# D[2,2]    D[3,3]    SIGMA[1,1]
+# 32.096512 31.668012 10.775738
+
+# !! plotResponse: logAxis unavalaible in the plot options
 
 
 
