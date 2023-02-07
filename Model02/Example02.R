@@ -14,15 +14,15 @@ MyStatisticalModel = StatisticalModel()
 #k21= (Q/V2)
 #CP = (C1/V1)
 
-KM = 1.2
-Q = 10
-V2 = 4
+assign("KM",1.2)
+assign("Q",10)
+assign("V",4)
 
 MyModelEquations = ModelODEquations( list("Resp1" = expression( C1 ),
                                           "Resp2" = expression( C2 ) ) ,
 
-                                      list("Deriv_C1" = expression( (Q/V2)*C2 - (Q/V1)*C1 - VMAX*(C1/V1)/(KM + (C1/V1)) - (CL/V1)*C1 ) ,
-                                           "Deriv_C2" = expression( (Q/V1)*C1 -  (Q/V2)*C2 ) ) )
+                                     list("Deriv_C1" = expression( (Q/V2)*C2 - (Q/V1)*C1 - VMAX*(C1/V1)/(KM + (C1/V1)) - (CL/V1)*C1 ) ,
+                                          "Deriv_C2" = expression( (Q/V1)*C1 -  (Q/V2)*C2 ) ) )
 
 ### Assign the equations to the model
 MyStatisticalModel = defineModelEquations( MyStatisticalModel, MyModelEquations )
@@ -71,12 +71,12 @@ MyDesign= Design("Design")
 Bras_test_group1 = Arm( name="Bras_test_group1", arm_size = 6 )
 
 Bras_test_group1 = addSampling( Bras_test_group1, SamplingTimes( outcome = "Resp1",
-                                                  sample_time =  c(c(1, 4)/24, 1, 3, 7, 14, 21) ) )
+                                                                 sample_time = c(c(1, 4)/24, 1, 3, 7, 14, 21) ) )
 
 Bras_test_group1 = addSampling( Bras_test_group1, SamplingTimes( outcome = "Resp2",
-                                                  sample_time = c(c(1, 4)/24, 1, 3, 7, 14, 21) ) )
+                                                                 sample_time = c(c(1, 4)/24, 1, 3, 7, 14, 21) ) )
 
-Bras_test_group1 = addAdministration( Bras_test_group1, Administration( outcome = "Resp1", time_dose = c(0.0), amount_dose = c(1000*0.03) ) )
+Bras_test_group1 = addAdministration( Bras_test_group1, Administration( outcome = "Resp1", time_dose = c(0), amount_dose = c(1000*0.1) ) )
 
 Bras_test_group1 = setInitialConditions( Bras_test_group1, list( "C1" = expression( dose_Resp1 ), "C2" = 0 ) )
 
@@ -98,33 +98,48 @@ evaluationPop = EvaluatePopulationFIM( MyProject )
 
 
 
+if(F){
+plotPredictedResponses =
+
+  ggplot( predictedResponses, aes(x = time   , y = Resp1 )) +
+
+  geom_point() +
+
+  geom_line() +
+
+  scale_y_continuous(trans = 'log10', limits = c( 0.01, 1e4) )
+
+
+print( plotPredictedResponses )
+}
+
 
 
 if(F){
-evaluationInd = EvaluateIndividualFIM( MyProject )
-evaluationBay = EvaluateBayesianFIM( MyProject )
+  evaluationInd = EvaluateIndividualFIM( MyProject )
+  evaluationBay = EvaluateBayesianFIM( MyProject )
 
-### Summary
+  ### Summary
 
-show( evaluationPop )
-show( evaluationInd )
-show( evaluationBay )
+  show( evaluationPop )
+  show( evaluationInd )
+  show( evaluationBay )
 
-outputPath = "C:/Users/ADMIN Romain LEROUX/Documents/GIT PFIM/PFIM/PFIM_CRAN/Tests_package/evaluation/ode"
+  outputPath = "C:/Users/ADMIN Romain LEROUX/Documents/GIT PFIM/PFIM/PFIM_CRAN/Tests_package/evaluation/ode"
 
-plotOptions = list( unitTime=c("unit time"),
-                    unitResponses= c("unit RespPK","unit RespPD" ) )
+  plotOptions = list( unitTime=c("unit time"),
+                      unitResponses= c("unit RespPK","unit RespPD" ) )
 
-reportPFIMProject( evaluationPop,
-                   outputPath = outputPath, plotOptions = plotOptions )
+  reportPFIMProject( evaluationPop,
+                     outputPath = outputPath, plotOptions = plotOptions )
 
-evaluationInd = setNamePFIMProject( evaluationInd, "PKPD_ode_bolus_individualFIM" )
-reportPFIMProject( evaluationInd,
-                   outputPath = outputPath, plotOptions = plotOptions )
+  evaluationInd = setNamePFIMProject( evaluationInd, "PKPD_ode_bolus_individualFIM" )
+  reportPFIMProject( evaluationInd,
+                     outputPath = outputPath, plotOptions = plotOptions )
 
-evaluationBay = setNamePFIMProject( evaluationBay, "PKPD_ode_bolus_bayesianFIM" )
-reportPFIMProject( evaluationBay,
-                   outputPath = outputPath, plotOptions = plotOptions )
+  evaluationBay = setNamePFIMProject( evaluationBay, "PKPD_ode_bolus_bayesianFIM" )
+  reportPFIMProject( evaluationBay,
+                     outputPath = outputPath, plotOptions = plotOptions )
 }
 
 
