@@ -19,9 +19,9 @@ Q = 10
 V2 = 4
 
 MyModelEquations = ModelODEquations( list("Resp1" = expression( C1 ),
-                                           "Resp2" = expression( C2 ) ) ,
+                                          "Resp2" = expression( C2 ) ) ,
 
-                                      list("Deriv_C1" = expression( (Q/V2)*C2 - (Q/V1)*C1 - VMAX*CP/(KM + (C1/V1)) - (CL/V1)*C1 ) ,
+                                      list("Deriv_C1" = expression( (Q/V2)*C2 - (Q/V1)*C1 - VMAX*(C1/V1)/(KM + (C1/V1)) - (CL/V1)*C1 ) ,
                                            "Deriv_C2" = expression( (Q/V1)*C1 -  (Q/V2)*C2 ) ) )
 
 ### Assign the equations to the model
@@ -49,38 +49,39 @@ pV1 = ModelParameter( "V1", mu = 2.5,
                       distribution = LogNormalDistribution() )
 
 ### Assign the parameters to the statistical model
-MyStatisticalModel = defineParameter( MyStatisticalModel, pV1 )
-MyStatisticalModel = defineParameter( MyStatisticalModel, pRin )
+MyStatisticalModel = defineParameter( MyStatisticalModel, pCL )
 MyStatisticalModel = defineParameter( MyStatisticalModel, pVMAX )
-
-
+MyStatisticalModel = defineParameter( MyStatisticalModel, pV1 )
 
 ### Create and add the responses to the statistical model
-MyStatisticalModel = addResponse( MyStatisticalModel, Response( "Resp1", Combined1( sigma_inter = 0.6, sigma_slope = 0.07 ) ) )
-MyStatisticalModel = addResponse( MyStatisticalModel, Response( "Resp2", Proportionnal( sigma_slope = 4 ) ) )
+MyStatisticalModel = addResponse( MyStatisticalModel, Response( "Resp1", Proportional( sigma_slope = 0.15 ) ) )
+MyStatisticalModel = addResponse( MyStatisticalModel, Response( "Resp2", Proportional( sigma_slope = 0.15 ) ) )
 
 ### Finaly assign the statistical model to the project
 MyProject = defineStatisticalModel( MyProject, MyStatisticalModel )
 
 ### Create a design
-MyDesign= Design("MyDesign")
+MyDesign= Design("Design")
+
+
+#DOSE = c(0.03, 0.1, 0.3, 1, 3, 10)
+# 6 groups 1/grp/dose
 
 ### For each arm create and add the sampling times for each response
-brasTest = Arm( name="Bras test", arm_size = 32 )
+Bras_test_group1 = Arm( name="Bras_test_group1", arm_size = 6 )
 
-brasTest = addSampling( brasTest, SamplingTimes( outcome = "Resp1",
-                                                  sample_time =  c( 0.5, 1, 2, 6, 9, 12, 24, 36, 48, 72, 96, 120 ) ) )
+Bras_test_group1 = addSampling( Bras_test_group1, SamplingTimes( outcome = "Resp1",
+                                                  sample_time =  c(c(1, 4)/24, 1, 3, 7, 14, 21) ) )
 
-brasTest = addSampling( brasTest, SamplingTimes( outcome = "Resp2",
-                                                  sample_time = c( 0,24,36,48,72,96,120 ) ) )
+Bras_test_group1 = addSampling( Bras_test_group1, SamplingTimes( outcome = "Resp2",
+                                                  sample_time = c(c(1, 4)/24, 1, 3, 7, 14, 21) ) )
 
-brasTest = addAdministration( brasTest, Administration( outcome = "Resp1", time_dose = c(0), amount_dose = c(100) ) )
+Bras_test_group1 = addAdministration( Bras_test_group1, Administration( outcome = "Resp1", time_dose = c(0.0), amount_dose = c(1000*0.03) ) )
 
-brasTest = setInitialConditions( brasTest, list( "C1" = expression( dose_RespPK/V ),
-                                                  "C2" = expression( Rin/kout ) ) )
+Bras_test_group1 = setInitialConditions( Bras_test_group1, list( "C1" = expression( dose_Resp1 ), "C2" = 0 ) )
 
 ### Add the arm to the design
-MyDesign = addArm( MyDesign, brasTest )
+MyDesign = addArm( MyDesign, Bras_test_group1 )
 
 ### Add the design to the project
 MyProject = addDesign( MyProject, MyDesign )
