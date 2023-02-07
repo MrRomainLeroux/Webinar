@@ -1,14 +1,19 @@
 options(warn=-1)
 
-### Create PFIM project
+# -----------------------------------------------
+# Create PFIM project
+# -----------------------------------------------
+
 MyProject=PFIMProject(name = "PopED_Example02")
 
 MyStatisticalModel = StatisticalModel()
 
 # !! need to adjust .relStep for gradient computing
-MyStatisticalModel = setParametersOdeSolver( MyStatisticalModel, list( atol=1e-8, rtol=1e-8, .relStep = 1e-14 ) )
+MyStatisticalModel = setParametersOdeSolver( MyStatisticalModel, list( atol=1e-16, rtol=1e-6, .relStep = 1e-12 ) )
 
-### model equations
+# -----------------------------------------------
+# model equations
+# -----------------------------------------------
 
 #ke = (CL/V1)
 #k12 = (Q/V1)
@@ -21,17 +26,25 @@ MyModelEquations = ModelODEquations( list("RespPK" = expression( C1 ),
                                      list("Deriv_C1" = expression( (Q/V2)*C2 - (Q/V1)*C1 - VMAX*(C1/V1)/(KM + (C1/V1)) - (CL/V1)*C1 ) ,
                                           "Deriv_C2" = expression( (Q/V1)*C1 -  (Q/V2)*C2 ) ) )
 
-### Assign the equations to the model
+# -----------------------------------------------
+# Assign the equations to the model
+# -----------------------------------------------
+
 MyStatisticalModel = defineModelEquations( MyStatisticalModel, MyModelEquations )
 
-### Define the variables of the ode model
+# -----------------------------------------------
+# Define the variables of the ode model
+# -----------------------------------------------
+
 vC1 = ModelVariable( "C1/V1" )
 vC2 = ModelVariable( "C2" )
 
 MyStatisticalModel = defineVariable( MyStatisticalModel, vC1 )
 MyStatisticalModel = defineVariable( MyStatisticalModel, vC2 )
 
-#### Set mu and omega for each parameter
+# -----------------------------------------------
+# Set mu and omega for each parameter
+# -----------------------------------------------
 
 pCL = ModelParameter( "CL", mu = 0.5,
                       omega = sqrt( 0.2 ),
@@ -60,7 +73,10 @@ pKM = ModelParameter( "KM", mu = 1.2,
                       fixedMu = FALSE,
                       distribution = LogNormalDistribution() )
 
-### Assign the parameters to the statistical model
+# ------------------------------------------------
+# Assign the parameters to the statistical model
+# ------------------------------------------------
+
 MyStatisticalModel = defineParameter( MyStatisticalModel, pCL )
 MyStatisticalModel = defineParameter( MyStatisticalModel, pVMAX )
 MyStatisticalModel = defineParameter( MyStatisticalModel, pV1 )
@@ -68,18 +84,27 @@ MyStatisticalModel = defineParameter( MyStatisticalModel, pQ )
 MyStatisticalModel = defineParameter( MyStatisticalModel, pV2 )
 MyStatisticalModel = defineParameter( MyStatisticalModel, pKM )
 
+# -----------------------------------------------------
+# Create and add the responses to the statistical model
+# -----------------------------------------------------
 
-### Create and add the responses to the statistical model
 MyStatisticalModel = addResponse( MyStatisticalModel, Response( "RespPK", Proportional( sigma_slope = 0.15 ) ) )
 
-### Finaly assign the statistical model to the project
+# -----------------------------------------------------
+# Finaly assign the statistical model to the project
+# -----------------------------------------------------
+
 MyProject = defineStatisticalModel( MyProject, MyStatisticalModel )
 
-### Create a design
+# -----------------------------------------------------
+# Create a design
+# -----------------------------------------------------
+
 MyDesign= Design("Design")
 
-
-### For each arm create and add the sampling times & admministration for each response
+# -----------------------------------------------------------------------------------
+# For each arm create and add the sampling times & administration for each response
+# -----------------------------------------------------------------------------------
 
 dose_group1 = 0.03
 dose_group2 = 0.1
@@ -88,10 +113,18 @@ dose_group4 = 1
 dose_group5 = 3
 dose_group6 = 10
 
-sampleTimeGroup = c(c(1, 4)/24, 1, 3, 7, 14, 21)
+dose_group1 = 1000*dose_group1
+dose_group2 = 1000*dose_group2
+dose_group3 = 1000*dose_group3
+dose_group4 = 1000*dose_group4
+dose_group5 = 1000*dose_group5
+dose_group6 = 1000*dose_group6
 
-# for plot oroginal design
-sampleTimeGroup = c(c(1, 4)/24, 1, 3, 7, 14, 21)
+# sampleTimeGroup = c(c(1, 4)/24, 1, 3, 7, 14, 21)
+
+# for plot original design
+# !! system is computationally singular: reciprocal condition number = 1.1078e-25 for original design
+# sampleTimeGroup =  c( c( (1:4)/24, 1:21 ) )
 
 # group 1
 Bras_test_group1 = Arm( name="Bras_test_group1", arm_size = 6 )
@@ -99,7 +132,7 @@ Bras_test_group1 = addSampling( Bras_test_group1, SamplingTimes( outcome = "Resp
                                                                  sample_time = sampleTimeGroup ) )
 Bras_test_group1 = addSampling( Bras_test_group1, SamplingTimes( outcome = "RespPD",
                                                                  sample_time = sampleTimeGroup ) )
-Bras_test_group1 = addAdministration( Bras_test_group1, Administration( outcome = "RespPK", time_dose = c(0), amount_dose = 1000*dose_group1 ) )
+Bras_test_group1 = addAdministration( Bras_test_group1, Administration( outcome = "RespPK", time_dose = c(0), amount_dose = dose_group1 ) )
 Bras_test_group1 = setInitialConditions( Bras_test_group1, list( "C1" = expression( dose_RespPK ), "C2" = 0 ) )
 
 # group 2
@@ -108,7 +141,7 @@ Bras_test_group2 = addSampling( Bras_test_group2, SamplingTimes( outcome = "Resp
                                                                  sample_time = sampleTimeGroup ) )
 Bras_test_group2 = addSampling( Bras_test_group2, SamplingTimes( outcome = "RespPD",
                                                                  sample_time = sampleTimeGroup ) )
-Bras_test_group2 = addAdministration( Bras_test_group2, Administration( outcome = "RespPK", time_dose = c(0), amount_dose = 1000*dose_group2 ) )
+Bras_test_group2 = addAdministration( Bras_test_group2, Administration( outcome = "RespPK", time_dose = c(0), amount_dose = dose_group2 ) )
 Bras_test_group2 = setInitialConditions( Bras_test_group2, list( "C1" = expression( dose_RespPK ), "C2" = 0 ) )
 
 # group 3
@@ -117,7 +150,7 @@ Bras_test_group3 = addSampling( Bras_test_group3, SamplingTimes( outcome = "Resp
                                                                  sample_time = sampleTimeGroup ) )
 Bras_test_group3 = addSampling( Bras_test_group3, SamplingTimes( outcome = "RespPD",
                                                                  sample_time = sampleTimeGroup ) )
-Bras_test_group3 = addAdministration( Bras_test_group3, Administration( outcome = "RespPK", time_dose = c(0), amount_dose = 1000*dose_group3 ) )
+Bras_test_group3 = addAdministration( Bras_test_group3, Administration( outcome = "RespPK", time_dose = c(0), amount_dose = dose_group3 ) )
 Bras_test_group3 = setInitialConditions( Bras_test_group3, list( "C1" = expression( dose_RespPK ), "C2" = 0 ) )
 
 # group 4
@@ -126,7 +159,7 @@ Bras_test_group4 = addSampling( Bras_test_group4, SamplingTimes( outcome = "Resp
                                                                  sample_time = sampleTimeGroup ) )
 Bras_test_group4 = addSampling( Bras_test_group4, SamplingTimes( outcome = "RespPD",
                                                                  sample_time = sampleTimeGroup ) )
-Bras_test_group4 = addAdministration( Bras_test_group4, Administration( outcome = "RespPK", time_dose = c(0), amount_dose = 1000*dose_group4 ) )
+Bras_test_group4 = addAdministration( Bras_test_group4, Administration( outcome = "RespPK", time_dose = c(0), amount_dose = dose_group4 ) )
 Bras_test_group4 = setInitialConditions( Bras_test_group4, list( "C1" = expression( dose_RespPK ), "C2" = 0 ) )
 
 # group 5
@@ -135,7 +168,7 @@ Bras_test_group5 = addSampling( Bras_test_group5, SamplingTimes( outcome = "Resp
                                                                  sample_time = sampleTimeGroup ) )
 Bras_test_group5 = addSampling( Bras_test_group5, SamplingTimes( outcome = "RespPD",
                                                                  sample_time = sampleTimeGroup ) )
-Bras_test_group5 = addAdministration( Bras_test_group5, Administration( outcome = "RespPK", time_dose = c(0), amount_dose = 1000*dose_group5 ) )
+Bras_test_group5 = addAdministration( Bras_test_group5, Administration( outcome = "RespPK", time_dose = c(0), amount_dose = dose_group5 ) )
 Bras_test_group5 = setInitialConditions( Bras_test_group5, list( "C1" = expression( dose_RespPK ), "C2" = 0 ) )
 
 # group 6
@@ -144,10 +177,10 @@ Bras_test_group6 = addSampling( Bras_test_group6, SamplingTimes( outcome = "Resp
                                                                  sample_time = sampleTimeGroup ) )
 Bras_test_group6 = addSampling( Bras_test_group6, SamplingTimes( outcome = "RespPD",
                                                                  sample_time = sampleTimeGroup ) )
-Bras_test_group6 = addAdministration( Bras_test_group6, Administration( outcome = "RespPK", time_dose = c(0), amount_dose = 1000*dose_group6 ) )
+Bras_test_group6 = addAdministration( Bras_test_group6, Administration( outcome = "RespPK", time_dose = c(0), amount_dose = dose_group6 ) )
 Bras_test_group6 = setInitialConditions( Bras_test_group6, list( "C1" = expression( dose_RespPK ), "C2" = 0 ) )
 
-### Add the arm to the design
+# Add the arm to the design
 MyDesign = addArm( MyDesign, Bras_test_group1 )
 MyDesign = addArm( MyDesign, Bras_test_group2 )
 MyDesign = addArm( MyDesign, Bras_test_group3 )
@@ -155,31 +188,35 @@ MyDesign = addArm( MyDesign, Bras_test_group4 )
 MyDesign = addArm( MyDesign, Bras_test_group5 )
 MyDesign = addArm( MyDesign, Bras_test_group6 )
 
-### Add the design to the project
+# Add the design to the project
 MyProject = addDesign( MyProject, MyDesign )
+
+# ---------------------------------------------------
+# evaluate the population FIM
+# ---------------------------------------------------
 
 evaluationPop = EvaluatePopulationFIM( MyProject )
 
+# ---------------------------------------------------
+# display the results
+# ---------------------------------------------------
+
 show( evaluationPop )
 
+# plot SE and RSE
 plotSE(evaluationPop)
-plotSE(evaluationPop)
 
-
-#bpop = c(CL = 0.5, VMAX = 20, KM = 1.2, V1 = 2.5, Q = 10, V2 = 4),
-
-# bpop[1]   bpop[2]   bpop[3] bpop[4]   bpop[5] bpop[6]   D[1,1]
-# 10.874541 10.660202 7.935122 6.355306 8.894763 3.620234 38.990317
-#
-# D[2,2]    D[3,3]    SIGMA[1,1]
-# 32.096512 31.668012 10.775738
+plotRSE(evaluationPop)
 
 # !! plotResponse: logAxis unavalaible in the plot options
+# plot evaluated design
 
-
-resultsEvaluation = evaluationPop@designs$Design@concentration
+designs = getDesign( evaluationPop )
+nameDesign = getNameDesign(MyDesign)
+resultsEvaluation = designs[[nameDesign]]@concentration
 resultsResponse = do.call(rbind,resultsEvaluation)
-groupNames = paste0("Group",rep(1:6, each=8))
+lengthSamplingTimes = length( designs[[nameDesign]]@concentration$Bras_test_group1$time )
+groupNames = paste0("Group",rep(1: getArmSize(Bras_test_group1) , each=lengthSamplingTimes))
 resultsResponse = cbind( resultsResponse, groupNames )
 colnames(resultsResponse) = c("time","RespPK","Group")
 
@@ -188,43 +225,6 @@ ggplot( resultsResponse, aes( x = time, y = RespPK , colour = Group ) ) +
   geom_line() +
   scale_x_continuous( "Time fro dose (days)" ) +
   scale_y_continuous( "Model predictions", trans = 'log10', limits = c( 0.01, 1e4) )
-
-
-
-
-
-
-if(F){
-  evaluationInd = EvaluateIndividualFIM( MyProject )
-  evaluationBay = EvaluateBayesianFIM( MyProject )
-
-  ### Summary
-
-  show( evaluationPop )
-  show( evaluationInd )
-  show( evaluationBay )
-
-  outputPath = "C:/Users/ADMIN Romain LEROUX/Documents/GIT PFIM/PFIM/PFIM_CRAN/Tests_package/evaluation/ode"
-
-  plotOptions = list( unitTime=c("unit time"),
-                      unitResponses= c("unit RespPK","unit RespPD" ) )
-
-  reportPFIMProject( evaluationPop,
-                     outputPath = outputPath, plotOptions = plotOptions )
-
-  evaluationInd = setNamePFIMProject( evaluationInd, "PKPD_ode_bolus_individualFIM" )
-  reportPFIMProject( evaluationInd,
-                     outputPath = outputPath, plotOptions = plotOptions )
-
-  evaluationBay = setNamePFIMProject( evaluationBay, "PKPD_ode_bolus_bayesianFIM" )
-  reportPFIMProject( evaluationBay,
-                     outputPath = outputPath, plotOptions = plotOptions )
-}
-
-
-
-
-
 
 
 
