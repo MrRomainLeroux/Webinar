@@ -55,7 +55,7 @@ MyDesign= Design("MyDesign")
 brasTest = Arm( name="Bras test", arm_size = 12 )
 
 brasTest = addSampling( brasTest, SamplingTimes( outcome = "RespPK1",
-                                                 sample_time = c( 5, 72, 96 ,120+168 ) ) )
+                                                 sample_time = c( 5, 72, 96 ,120 ) ) )
 
 brasTest = addAdministration( brasTest, Administration( outcome = "RespPK1",
                                                         time_dose = c( 0, 24, 48, 72, 96 ),

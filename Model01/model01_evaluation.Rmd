@@ -116,26 +116,26 @@ design4 = Design("design4")
 ```{r brasTestDesign1, echo = FALSE, asis = TRUE}
 brasTestDesign1 = Arm( name="Bras test", arm_size = 12 )
 brasTestDesign1 = addSampling( brasTestDesign1, SamplingTimes( outcome = "RespPK1",
-                                                               sample_time = c( 1, 24, 48 , 96 ) ) )
+                                                           sample_time = c( 1, 24, 48 , 96 ) ) )
 ```
 
-# ```{r brasTestDesign2, echo = FALSE, asis = TRUE}
-# brasTestDesign2 = Arm( name="Bras test", arm_size = 12 )
-# brasTestDesign2 = addSampling( brasTestDesign2, SamplingTimes( outcome = "RespPK1",
-#                                                                sample_time = c( 4, 24, 48 ,96 ) ) )
-# ```
-# 
-# ```{r brasTestDesign3, echo = FALSE, include = FALSE}
-# brasTestDesign3 = Arm( name="Bras test", arm_size = 12 )
-# brasTestDesign3 = addSampling( brasTestDesign3, SamplingTimes( outcome = "RespPK1",
-#                                                                sample_time = c( 6, 24, 48 ,96 ) ) )
-# ```
-# 
-# ```{r brasTestDesign4, echo = FALSE, asis = TRUE}
-# brasTestDesign4 = Arm( name="Bras test", arm_size = 12 )
-# brasTestDesign4 = addSampling( brasTestDesign4, SamplingTimes( outcome = "RespPK1",
-#                                                                sample_time = c( 12, 24, 48 ,96 ) ) )
-# ```
+```{r brasTestDesign2, echo = FALSE, asis = TRUE}
+brasTestDesign2 = Arm( name="Bras test", arm_size = 12 )
+brasTestDesign2 = addSampling( brasTestDesign2, SamplingTimes( outcome = "RespPK1",
+                                                              sample_time = c( 4, 24, 48 ,96 ) ) )
+```
+
+```{r brasTestDesign3, echo = FALSE, include = FALSE}
+brasTestDesign3 = Arm( name="Bras test", arm_size = 12 )
+brasTestDesign3 = addSampling( brasTestDesign3, SamplingTimes( outcome = "RespPK1",
+                                                              sample_time = c( 6, 24, 48 ,96 ) ) )
+```
+
+```{r brasTestDesign4, echo = FALSE, asis = TRUE}
+brasTestDesign4 = Arm( name="Bras test", arm_size = 12 )
+brasTestDesign4 = addSampling( brasTestDesign4, SamplingTimes( outcome = "RespPK1",
+                                                              sample_time = c( 12, 24, 48 ,96 ) ) )
+```
 
 ```{r, echo = FALSE, asis = TRUE}
 
