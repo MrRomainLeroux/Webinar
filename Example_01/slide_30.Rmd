@@ -1,0 +1,162 @@
+---
+title: "Slide_30"
+fig: no crop
+geometry: left=1mm, right=1mm, top=1mm, bottom=1mm, asymmetric
+indent: TRUE
+output: 
+  html_document: 
+    fig_caption: yes
+---
+
+<style type="text/css">
+
+body{
+font-size: 11pt;
+}
+
+h1.title {
+font-size: 40pt;
+}
+
+code.r{
+font-size: 11pt;
+}
+
+body {
+max-width: 1600px;  
+margin-left:10px;
+line-height: 20px;
+}
+
+</style>
+
+```{r global_options, echo = FALSE, include = FALSE}
+backup_options <- options()
+options(width = 3000)
+knitr::opts_chunk$set(collapse = TRUE,
+comment = "#>",echo = FALSE, warning = FALSE, message = FALSE,
+cache = FALSE, tidy = FALSE, size = "small")
+devtools::load_all()
+```
+ 
+```{r, eval=TRUE, asis = TRUE}
+# Create PFIM project
+MyProject = PFIMProject( name = "PFIM_model_01" )
+```
+
+```{r MyStatisticalModel, echo = FALSE, asis = TRUE}
+# Create the statistical model
+MyStatisticalModel = StatisticalModel()
+```
+
+```{r constantParameters, echo = FALSE, asis = TRUE}
+# constant parameters
+Wt = 32
+WtCl = 0.75
+WtV = 1
+```
+
+```{r ModelEquations, echo = FALSE, asis = TRUE}
+# Model equations
+MyPKModel = ModelEquations( list( "RespPK1" = expression( ( dose_RespPK1 * ka/((V*(Wt/70)**(WtV)) *
+                                                                                 (ka - (Cl*(Wt/70)**(WtCl))/(V*(Wt/70)**(WtV))))) *
+                                                            (exp(-(Cl*(Wt/70)**(WtCl))/(V*(Wt/70)**(WtV)) *t) - exp(-ka * t ) ) ) ) )
+```
+
+```{r defineModelEquations, echo = FALSE, asis = TRUE}
+# Assign the equations to the statistical model
+MyStatisticalModel = defineModelEquations( MyStatisticalModel, MyPKModel)
+```
+
+```{r ModelParameters, echo = FALSE, asis = TRUE}
+# Set mu and omega for each parameter
+pka = ModelParameter( "ka", mu = 0.25,
+                      omega = sqrt( 0.08 ),
+                      distribution = LogNormalDistribution() )
+
+pV = ModelParameter( "V", mu = 100,
+                     omega = sqrt( 0.1 ),
+                     distribution = LogNormalDistribution() )
+
+pCl = ModelParameter( "Cl", mu = 10,
+                      omega = sqrt( 0.2 ),
+                      distribution = LogNormalDistribution() )
+```
+
+```{r defineParameter, echo = FALSE, asis = TRUE}
+# Assign the parameters to the statistical model
+MyStatisticalModel = defineParameter( MyStatisticalModel, pka )
+MyStatisticalModel = defineParameter( MyStatisticalModel, pV )
+MyStatisticalModel = defineParameter( MyStatisticalModel, pCl )
+```
+
+```{r addResponse, echo = FALSE, asis = TRUE}
+# Create and add the responses to the statistical model
+MyStatisticalModel = addResponse( MyStatisticalModel, Response( "RespPK1",
+                                                                Combined1( sigma_inter = 1.0, sigma_slope = 0.05 ) ) )
+```
+
+```{r defineStatisticalModel, echo = FALSE, asis = TRUE}
+# assign the statistical model to the project
+MyProject = defineStatisticalModel( MyProject, MyStatisticalModel )
+```
+
+```{r Design, echo = FALSE, asis = TRUE}
+# Create designs
+design1 = Design("design1")
+design2 = Design("design2")
+```
+
+```{r brasTestDesign, echo = FALSE, asis = TRUE}
+# For each arm create and add the sampling times for each response
+
+brasTestDesign1 = Arm( name="Bras test", arm_size = 12 )
+brasTestDesign1 = addSampling( brasTestDesign1, SamplingTimes( outcome = "RespPK1",
+                                                           sample_time = c( 0.5, c( 120, 144, 168 ), 200, 336 ) ) )
+
+```
+
+```{r, echo = FALSE, asis = TRUE}
+
+brasTestDesign1 = addAdministration( brasTestDesign1, Administration( outcome = "RespPK1",
+                                                                      time_dose = seq(0,168,24),
+                                                                      amount_dose = rep( 10000,8 )))
+
+```
+
+```{r, echo = FALSE, asis = TRUE}
+design1 = addArm( design1, brasTestDesign1 )
+MyProject = addDesign( MyProject, design1 )
+```
+
+```{r, echo = TRUE,  comment='', asis = TRUE}
+evaluationPop = EvaluatePopulationFIM( MyProject ) 
+```
+
+### Results of the evaluation
+
+```{r, echo = TRUE,  comment='', asis = TRUE}
+show( evaluationPop )
+```
+
+### Graphs of the responses
+
+```{r, echo = TRUE,  comment='', asis = TRUE}
+
+plotOptions = list( unitTime=c("hr"),
+                    unitResponses= c("ng/ml") )
+
+plotResponse = plotResponse( evaluationPop, plotOptions )
+
+print( plotResponse[[1]] )
+
+```
+
+### Graphs of the RSE 
+
+```{r, echo = TRUE,  comment='', asis = TRUE}
+plotRSE = plotRSE( evaluationPop )
+
+print( plotRSE[[1]] )
+```
+
