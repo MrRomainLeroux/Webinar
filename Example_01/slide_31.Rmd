@@ -1,5 +1,5 @@
 ---
-title: "Slide_29"
+title: "Slide_31"
 fig: no crop
 geometry: left=1mm, right=1mm, top=1mm, bottom=1mm, asymmetric
 indent: TRUE
@@ -34,7 +34,7 @@ line-height: 20px;
 </style>
 
 ```{r global_options, echo = FALSE, include = FALSE}
-backup_options = options()
+backup_options <- options()
 options(width = 3000)
 knitr::opts_chunk$set(collapse = TRUE,
 comment = "#>",echo = FALSE, warning = FALSE, message = FALSE,
@@ -42,7 +42,7 @@ cache = FALSE, tidy = FALSE, size = "small")
 devtools::load_all()
 ```
  
-```{r PFIMProject, eval=TRUE, asis = TRUE}
+```{r, eval=TRUE, asis = TRUE}
 # Create PFIM project
 MyProject = PFIMProject( name = "PFIM_model_01" )
 ```
@@ -115,66 +115,45 @@ design2 = Design("design2")
 
 brasTestDesign1 = Arm( name="Bras test", arm_size = 12 )
 brasTestDesign1 = addSampling( brasTestDesign1, SamplingTimes( outcome = "RespPK1",
-                                                           sample_time = c( 5, c( 120, 144, 168 ), 240, 336 ) ) )
+                                                           sample_time = c( 0.5, c( 120, 144, 168 ), 200, 336 ) ) )
+
 ```
 
 ```{r, echo = FALSE, asis = TRUE}
 
 brasTestDesign1 = addAdministration( brasTestDesign1, Administration( outcome = "RespPK1",
                                                                       time_dose = seq( 0, 168, 24 ),
-                                                                      amount_dose = rep( 10000,8 ) ) )
-```
+                                                                      amount_dose = rep( 10000, 8 ) ) )
 
-```{r, echo = FALSE, asis = TRUE}
-# Create a sampling constraint for response
-samplingBoundsConstraint = SamplingConstraint( response = "RespPK", continuousSamplingTimes = list( c( 0, 6 ), 
-                                                                                                    c( 119, 120 ),
-                                                                                                    c( 143, 144 ),
-                                                                                                    c( 167, 168 ),
-                                                                                                    c( 168, 336 ),
-                                                                                                    c( 336, 336 ) ) )
-```
-
-```{r, echo = FALSE, asis = TRUE}
-Constr1 = DesignConstraint("SamplingTimesConstraint")
-Constr1 = addSamplingConstraint( Constr1, samplingBoundsConstraint )
-MyProject = setConstraint( MyProject, Constr1 )
 ```
 
 ```{r, echo = FALSE, asis = TRUE}
 design1 = addArm( design1, brasTestDesign1 )
-
 MyProject = addDesign( MyProject, design1 )
 ```
 
-```{r, echo = TRUE, asis = TRUE}
-# Run the optimization
-simplexOptimizer = SimplexAlgorithm( pct_initial_simplex_building = 20,
-                                     max_iteration = 5000,
-                                     tolerance = 1e-6 )
-
-optimization_populationFIM = OptimizeDesign( MyProject , simplexOptimizer, PopulationFim() )
-
-```
-
-### Results of the optimization
 ```{r, echo = TRUE,  comment='', asis = TRUE}
-show( optimization_populationFIM )
+evaluationPop = EvaluatePopulationFIM( MyProject ) 
 ```
 
-### Graph of the responses
+### Results of the evaluation
+```{r, echo = TRUE,  comment='', asis = TRUE}
+show( evaluationPop )
+```
+
+### Graphs of the responses
 ```{r, echo = TRUE,  comment='', asis = TRUE}
 plotOptions = list( unitTime=c("hr"),
                     unitResponses= c("ng/ml") )
 
-plotResponse = plotResponse( optimization_populationFIM, plotOptions )
+plotResponse = plotResponse( evaluationPop, plotOptions )
 
 print( plotResponse[[1]] )
 ```
 
-### Graph of the RSE 
+### Graphs of the RSE 
 ```{r, echo = TRUE,  comment='', asis = TRUE}
-plotRSE = plotRSE( optimization_populationFIM )
+plotRSE = plotRSE( evaluationPop )
 
 print( plotRSE[[1]] )
 ```

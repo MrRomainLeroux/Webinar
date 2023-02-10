@@ -5,7 +5,10 @@ geometry: left=1mm, right=1mm, top=1mm, bottom=1mm, asymmetric
 indent: TRUE
 output: 
   html_document: 
+    df_print: paged
     fig_caption: yes
+    output: 
+    highlight: textmate
 ---
 
 <style type="text/css">
@@ -39,9 +42,9 @@ cache = FALSE, tidy = FALSE, size = "small")
 devtools::load_all()
 ```
  
-```{r, eval=TRUE, asis = TRUE}
+```{r PFIMProject, eval=TRUE, asis = TRUE}
 # Create PFIM project
-MyProject = PFIMProject( name = "PFIM_model_01" )
+MyProject = PFIMProject( name = "PFIM_Example01_Evaluation" )
 ```
 
 ```{r MyStatisticalModel, echo = FALSE, asis = TRUE}
@@ -143,15 +146,12 @@ evaluationPop = EvaluatePopulationFIM( MyProject )
 ```
 
 ### Results of the evaluation
-
 ```{r, echo = TRUE,  comment='', asis = TRUE}
 show( evaluationPop )
 ```
 
 ### Graphs of the responses
-
 ```{r, echo = TRUE,  comment='', asis = TRUE}
-
 plotOptions = list( unitTime=c("hr"),
                     unitResponses= c("ng/ml") )
 
@@ -159,11 +159,9 @@ plotResponse = plotResponse( evaluationPop, plotOptions )
 
 print( plotResponse[[1]] )
 print( plotResponse[[2]] )
-
 ```
 
 ### Graphs of the RSE 
-
 ```{r, echo = TRUE,  comment='', asis = TRUE}
 plotRSE = plotRSE( evaluationPop )
 
