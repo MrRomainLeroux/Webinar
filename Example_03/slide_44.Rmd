@@ -72,91 +72,91 @@ SM3   = THETA18
 #KTT   = THETA13
 #CP0   = BAS
 
-KA = ModelParameter( "KA", mu = 6.42E-01,
-                     omega = sqrt( 0.00E+00 ),
-                     fixedMu = FALSE,
-                     fixedOmega = TRUE,
-                     distribution = LogNormalDistribution() )
+pKA = ModelParameter( "KA", mu = 6.42E-01,
+                      omega = sqrt( 0.00E+00 ),
+                      fixedMu = FALSE,
+                      fixedOmega = TRUE,
+                      distribution = LogNormalDistribution() )
 
-KEL = ModelParameter( "KEL", mu = 1.48E-01,
-                      omega = sqrt( 3.12E-01),
+pKEL = ModelParameter( "KEL", mu = 1.48E-01,
+                       omega = sqrt( 3.12E-01),
+                       fixedMu = FALSE,
+                       fixedOmega = FALSE,
+                       distribution = LogNormalDistribution() )
+
+pVD = ModelParameter( "VD", mu = 2.56E+00,
+                      omega = sqrt( 3.28E-01 ),
                       fixedMu = FALSE,
                       fixedOmega = FALSE,
                       distribution = LogNormalDistribution() )
 
-VD = ModelParameter( "VD", mu = 2.56E+00,
-                     omega = sqrt( 3.28E-01 ),
-                     fixedMu = FALSE,
-                     fixedOmega = FALSE,
-                     distribution = LogNormalDistribution() )
+pKD = ModelParameter( "KD ", mu = THETA7,
+                      omega = sqrt( 0 ),
+                      fixedMu = FALSE,
+                      fixedOmega = TRUE,
+                      distribution = LogNormalDistribution() )
 
-KD = ModelParameter( "KD ", mu = THETA7,
-                     omega = sqrt( 0 ),
-                     fixedMu = FALSE,
-                     fixedOmega = TRUE,
-                     distribution = LogNormalDistribution() )
+pKINT = ModelParameter( "KINT ", mu = THETA8,
+                        omega = sqrt( 0 ),
+                        fixedMu = FALSE,
+                        fixedOmega = TRUE,
+                        distribution = LogNormalDistribution() )
 
-KINT = ModelParameter( "KINT ", mu = THETA8,
+pKSI = ModelParameter( "KSI", mu = 2.11E-01,
+                       omega = sqrt( 2.24E-01 ),
+                       fixedMu = FALSE,
+                       fixedOmega = FALSE,
+                       distribution = LogNormalDistribution() )
+
+pKMT = ModelParameter( "KMT", mu = THETA11,
                        omega = sqrt( 0 ),
                        fixedMu = FALSE,
                        fixedOmega = TRUE,
                        distribution = LogNormalDistribution() )
 
-KSI = ModelParameter( "KSI", mu = 2.11E-01,
-                      omega = sqrt( 2.24E-01 ),
-                      fixedMu = FALSE,
-                      fixedOmega = FALSE,
-                      distribution = LogNormalDistribution() )
+pKTT = ModelParameter( "KTT", mu = THETA13,
+                       omega = sqrt( 0 ),
+                       fixedMu = FALSE,
+                       fixedOmega = TRUE,
+                       distribution = LogNormalDistribution() )
 
-KMT = ModelParameter( "KMT", mu = THETA11,
-                      omega = sqrt( 0 ),
-                      fixedMu = FALSE,
-                      fixedOmega = TRUE,
-                      distribution = LogNormalDistribution() )
+pNB0 = ModelParameter( "NB0", mu = 1.65E+00,
+                       omega = sqrt( 2.98E-01 ),
+                       fixedMu = FALSE,
+                       fixedOmega = FALSE,
+                       distribution = LogNormalDistribution() )
 
-KTT = ModelParameter( "KTT", mu = THETA13,
-                      omega = sqrt( 0 ),
-                      fixedMu = FALSE,
-                      fixedOmega = TRUE,
-                      distribution = LogNormalDistribution() )
+pSC1 = ModelParameter( "SC1", mu = 3.21E+00,
+                       omega = sqrt(  8.03E-01 ),
+                       fixedMu = FALSE,
+                       fixedOmega = FALSE,
+                       distribution = LogNormalDistribution() )
 
-NB0 = ModelParameter( "NB0", mu = 1.65E+00,
-                      omega = sqrt( 2.98E-01 ),
-                      fixedMu = FALSE,
-                      fixedOmega = FALSE,
-                      distribution = LogNormalDistribution() )
+pSM1 = ModelParameter( "SM1", mu = 3.43E+01,
+                       omega = sqrt( 1.28E-02 ),
+                       fixedMu = FALSE,
+                       fixedOmega = FALSE,
+                       distribution = LogNormalDistribution() )
 
-SC1 = ModelParameter( "SC1", mu = 3.21E+00,
-                      omega = sqrt(  8.03E-01 ),
-                      fixedMu = FALSE,
-                      fixedOmega = FALSE,
-                      distribution = LogNormalDistribution() )
-
-SM1 = ModelParameter( "SM1", mu = 3.43E+01,
-                      omega = sqrt( 1.28E-02 ),
-                      fixedMu = FALSE,
-                      fixedOmega = FALSE,
-                      distribution = LogNormalDistribution() )
-
-SM2 = ModelParameter( "SM2", mu = 3.23E+01,
-                      omega = sqrt( 0.0 ),
-                      fixedMu = FALSE,
-                      fixedOmega = TRUE,
-                      distribution = LogNormalDistribution() )
+pSM2 = ModelParameter( "SM2", mu = 3.23E+01,
+                       omega = sqrt( 0.0 ),
+                       fixedMu = FALSE,
+                       fixedOmega = TRUE,
+                       distribution = LogNormalDistribution() )
 
 # Assign the parameters to the statistical model
-MyStatisticalModel = defineParameter( MyStatisticalModel, KA )
-MyStatisticalModel = defineParameter( MyStatisticalModel, KEL )
-MyStatisticalModel = defineParameter( MyStatisticalModel, VD )
-MyStatisticalModel = defineParameter( MyStatisticalModel, KD )
-MyStatisticalModel = defineParameter( MyStatisticalModel, KINT )
-MyStatisticalModel = defineParameter( MyStatisticalModel, KSI )
-MyStatisticalModel = defineParameter( MyStatisticalModel, KMT )
-MyStatisticalModel = defineParameter( MyStatisticalModel, KTT )
-MyStatisticalModel = defineParameter( MyStatisticalModel, NB0 )
-MyStatisticalModel = defineParameter( MyStatisticalModel, SC1 )
-MyStatisticalModel = defineParameter( MyStatisticalModel, SM1 )
-MyStatisticalModel = defineParameter( MyStatisticalModel, SM2 )
+MyStatisticalModel = defineParameter( MyStatisticalModel, pKA )
+MyStatisticalModel = defineParameter( MyStatisticalModel, pKEL )
+MyStatisticalModel = defineParameter( MyStatisticalModel, pVD )
+MyStatisticalModel = defineParameter( MyStatisticalModel, pKD )
+MyStatisticalModel = defineParameter( MyStatisticalModel, pKINT )
+MyStatisticalModel = defineParameter( MyStatisticalModel, pKSI )
+MyStatisticalModel = defineParameter( MyStatisticalModel, pKMT )
+MyStatisticalModel = defineParameter( MyStatisticalModel, pKTT )
+MyStatisticalModel = defineParameter( MyStatisticalModel, pNB0 )
+MyStatisticalModel = defineParameter( MyStatisticalModel, pSC1 )
+MyStatisticalModel = defineParameter( MyStatisticalModel, pSM1 )
+MyStatisticalModel = defineParameter( MyStatisticalModel, pSM2 )
 ```
 
 ```{r ModelVariable, echo = FALSE, asis = TRUE}
@@ -193,14 +193,24 @@ MyStatisticalModel = defineVariable( MyStatisticalModel, NB )
 ```
 
 ```{r ModelEquations, echo = FALSE, asis = TRUE}
-
 CP0 = quote( dose_RespPK)
 
 NT = quote( B1+B2+B3+B4+B5+B6+B7+B8+B9+NB )
 RTOT = quote( KSI*NT )
 RTOT = do.call('substitute', list( RTOT, list( NT = NT ) ) )
+
+ATOT =  quote( CENT )
+BB =  quote( RTOT-ATOT/VD+KD )
+BB = do.call('substitute', list( BB, list( RTOT = RTOT,
+                                           ATOT = ATOT) ) )
+
+CP =  quote( 0.5*(-BB+sqrt(pow(BB,2.0)+4*KD*ATOT/VD)) )
+CP = do.call('substitute', list( CP, list( BB = BB,
+                                           ATOT = ATOT ) ) )
+
 ADR = quote( RTOT*AC/( KD+CP ) )
-ADR = do.call('substitute', list( ADR, list( RTOT = RTOT ) ) )
+ADR = do.call('substitute', list( ADR, list( RTOT = RTOT,
+                                             CP = CP ) ) )
 
 ## ---------------------------------------
 ## Deriv_B1
@@ -302,7 +312,6 @@ NT0 = do.call( 'substitute', list( NT0, list(  BM10=BM10,
                                                BM70=BM70,
                                                BM80=BM80,
                                                BM90=BM90 ) ) )
-
 
 RTOT0 = quote(KSI*NT0)
 RTOT0 = do.call( 'substitute', list( RTOT0, list( NT0 = NT0 ) ) )
@@ -549,23 +558,10 @@ CENT_init = quote(AC0_init + ADR0_init)
 CENT_init = do.call('substitute', list(CENT_init, list( AC0_init = AC0_init,
                                                         ADR0_init = ADR0_init) ) )
 
-FRR  = 0
-DR   = 0
-B1   = BM10_init
-B2   = BM20_init
-B3   = BM30_init
-B4   = BM40_init
-B5   = BM50_init
-B6   = BM60_init
-B7   = BM70_init
-B8   = BM80_init
-B9   = BM90_init
-NB   = NB0_init
-
-cond_init_arms = list( "ABS" = as.expression(0), 
+cond_init_arms = list( "ABS"  = 0, 
                        "CENT" = as.expression(CENT_init), 
-                       "FRR"  = as.expression(0),
-                       "DR"   = as.expression(0),
+                       "FRR"  = 0,
+                       "DR"   = 0,
                        "B1"   = as.expression(BM10_init),
                        "B2"   = as.expression(BM20_init),
                        "B3"   = as.expression(BM30_init),
@@ -575,7 +571,7 @@ cond_init_arms = list( "ABS" = as.expression(0),
                        "B7"   = as.expression(BM70_init),
                        "B8"   = as.expression(BM80_init),
                        "B9"   = as.expression(BM90_init),
-                       "NB"   = as.expression(NB0_init ) )
+                       "NB"   = NB0_init  )
 
 arm1 = Arm( name = "arm1", arm_size = 10, cond_init = cond_init_arms )
 arm2 = Arm( name = "arm2", arm_size = 10, cond_init = cond_init_arms )
