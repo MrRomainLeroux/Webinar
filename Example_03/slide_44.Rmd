@@ -41,7 +41,6 @@ WT = 75
 
 ## [PARAM] 
 ROUT  = 0
-BAS = 0.0246
 
 ## [THETA]
 THETA1 = 6.26E-01  #1
@@ -198,6 +197,8 @@ MyStatisticalModel = defineVariable( MyStatisticalModel, NB )
 
 ```{r ModelEquations, echo = FALSE, asis = TRUE}
 
+CP0_substitute = quote( dose_RespPK)
+
 ## ---------------------------------------
 ## Deriv_CENT
 ## ---------------------------------------
@@ -216,6 +217,8 @@ Deriv_B1 = expression( KINB* H1*(B1/BM10) - KBB1 * H3 * B1 - KTT * H2 * B1 )
 
 # KINB
 H10_substitute = quote(1.0 + SM1 * CP0 / (SC1 + CP0))
+H10_substitute = do.call( 'substitute', list( KINB, list( CP0 = CP0_substitute ) ) )
+
 KINB = expression(KMT * NB0 / H10)
 KINB = do.call( 'substitute', list( KINB[[1]], list( H10 = H10_substitute)))
 KINB_substitute = quote( KINB )
@@ -233,14 +236,16 @@ H3_substitute =  quote(1.0 + SM3 * CP / (SC1 + CP))
 H20_substitute = quote(1.0 + SM2 * CP0 / (SC1 + CP0))
 H30_substitute = quote(1.0 + SM3 * CP0 / (SC1 + CP0))
 
+H20_substitute = do.call( 'substitute', list( H20_substitute, list( CP0 = CP0_substitute ) ) )
+H30_substitute = do.call( 'substitute', list( H30_substitute, list( CP0 = CP0_substitute ) ) )
+
+
 BM10 = expression(KINB * H10 / (KBB1 * H30 + KTT * H20))
 
 BM10 = do.call( 'substitute', list( BM10[[1]], list( KINB = KINB_substitute, 
                                                      H10 = H10_substitute, 
                                                      H20 = H20_substitute,
                                                      H30 = H30_substitute ) ) )
-
-BM10_substitute =  quote( BM10 )
 
 Deriv_B1 = do.call('substitute', list(Deriv_B1[[1]], list( KINB = KINB_substitute,
                                                            H1 = H1_substitute,
@@ -306,7 +311,6 @@ Deriv_NB = do.call('substitute', list(Deriv_NB[[1]], list( H2 = H2_substitute,
 ## ---------------------------------------
 
 ZNB = quote(NB)
-
 ZNT_substitute = quote(B1+B2+B3+B4+B5+B6+B7+B8+B9+NB)
 
 RRTOT = expression(KSI*ZNT)
@@ -351,6 +355,84 @@ MyStatisticalModel = addResponse( MyStatisticalModel, Response( "RespPD",
 ```
 
 
+
+```{r, echo = FALSE, asis = TRUE}
+
+cond_init = function( dose_RespPK )
+{
+  KA_init = THETA2 * exp( sqrt( 0.0 ) )
+  KEL_init = THETA5* exp( sqrt( 3.12E-01 ) )
+  VD_init = THETA6 * exp( sqrt( 3.28E-01 ) )
+  KSI_init = THETA9 * exp( sqrt( 2.24E-01 ) )
+  NB0_init = THETA14 * exp( sqrt( 2.98E-01 ) )
+  SC1_init = THETA15 * exp( sqrt( 8.03E-01 ) )
+  SM1_init = THETA16 * exp( sqrt( 1.28E-02 ) )
+  SM2_init = THETA17 * exp( sqrt( 0 ) )
+  SM3_init = THETA18  
+  CP0_init = dose_RespPK
+  KMT_init = THETA11
+  
+  H10_init = ( 1.0 + SM1_init * CP0_init / (SC1_init + CP0_init ) )
+  H20_init = ( 1.0 + SM2_init * CP0_init / (SC1_init + CP0_init ) )
+  H30_init = ( 1.0 + SM3_init * CP0_init/ (SC1_init + CP0_init ) )
+  
+  KINB_init = KMT_init * NB0_init / H10_init
+  KBB1_init = THETA12
+  KTT_init = THETA13
+  KD_init = THETA7
+  
+  BM10_init = ( KINB_init * H10_init / (KBB1_init * H30_init + KTT_init * H20_init ) )
+  BM20_init = ( KTT_init * H20_init * BM10_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
+  BM30_init = ( KTT_init * H20_init * BM20_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
+  BM40_init = ( KTT_init * H20_init * BM30_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
+  BM50_init = ( KTT_init * H20_init * BM40_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
+  BM60_init = ( KTT_init * H20_init * BM50_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
+  BM70_init = ( KTT_init * H20_init * BM60_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
+  BM80_init = ( KTT_init * H20_init * BM70_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
+  BM90_init = ( KTT_init * H20_init * BM80_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
+  
+  # arms initial conditions
+  ABS  = 0
+  
+  # CENT
+  AC0_init = CP0_init * VD_init
+  NT0_init  = BM10_init + BM20_init + BM30_init + BM40_init + BM50_init + BM60_init + BM70_init + BM80_init + BM90_init + NB0_init
+  RTOT0_init = KSI_init*NT0_init
+  ADR0_init  = RTOT0_init*AC0_init/(KD_init+CP0_init)
+  CENT = AC0_init + ADR0_init
+  
+  FRR  = 0
+  DR   = 0
+  B1   = BM10_init
+  B2   = BM20_init
+  B3   = BM30_init
+  B4   = BM40_init
+  B5   = BM50_init
+  B6   = BM60_init
+  B7   = BM70_init
+  B8   = BM80_init
+  B9   = BM90_init
+  NB   = NB0_init
+  
+  cond_init_arms = list( "ABS" = 0, 
+                         "CENT" = AC0_init + ADR0_init, 
+                         "FRR"  = 0,
+                         "DR"   = 0,
+                         "B1"   = BM10_init,
+                         "B2"   = BM20_init,
+                         "B3"   = BM30_init,
+                         "B4"   = BM40_init,
+                         "B5"   = BM50_init,
+                         "B6"   = BM60_init,
+                         "B7"   = BM70_init,
+                         "B8"   = BM80_init,
+                         "B9"   = BM90_init,
+                         "NB"   = NB0_init )
+  
+  return( cond_init_arms )
+}
+```
+
 ```{r, echo = FALSE, asis = TRUE}
 
 # Assign the model to the project
@@ -363,83 +445,19 @@ MyDesign = Design("MyDesignclozapine")
 # initial conditions
 # -------------------------------------------------
 
-KA_init = THETA2 * exp( sqrt( 0.0 ) )
-KEL_init = THETA5* exp( sqrt( 3.12E-01 ) )
-VD_init = THETA6 * exp( sqrt( 3.28E-01 ) )
-KSI_init = THETA9 * exp( sqrt( 2.24E-01 ) )
-NB0_init = THETA14 * exp( sqrt( 2.98E-01 ) )
-SC1_init = THETA15 * exp( sqrt( 8.03E-01 ) )
-SM1_init = THETA16 * exp( sqrt( 1.28E-02 ) )
-SM2_init = THETA17 * exp( sqrt( 0 ) )
-SM3_init = THETA18  
+cond_init_arm1 = cond_init( dose_RespPK = 0.1 )
+cond_init_arm2 = cond_init( dose_RespPK = 0.3 )
+cond_init_arm3 = cond_init( dose_RespPK = 1 )
+cond_init_arm4 = cond_init( dose_RespPK = 31 )
+cond_init_arm5 = cond_init( dose_RespPK = 10 )
+cond_init_arm5 = cond_init( dose_RespPK = 30 )
 
-BAS_init = 0.0246
-CP0_init = BAS_init
-KMT_init = THETA11
-
-H10_init = ( 1.0 + SM1_init * CP0_init / (SC1_init + CP0_init ) )
-H20_init = ( 1.0 + SM2_init * CP0_init / (SC1_init + CP0_init ) )
-H30_init = ( 1.0 + SM3_init * CP0_init/ (SC1_init + CP0_init ) )
-
-KINB_init = KMT_init * NB0_init / H10_init
-KBB1_init = THETA12
-KTT_init = THETA13
-KD_init = THETA7
-
-BM10_init = ( KINB_init * H10_init / (KBB1_init * H30_init + KTT_init * H20_init ) )
-BM20_init = ( KTT_init * H20_init * BM10_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
-BM30_init = ( KTT_init * H20_init * BM20_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
-BM40_init = ( KTT_init * H20_init * BM30_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
-BM50_init = ( KTT_init * H20_init * BM40_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
-BM60_init = ( KTT_init * H20_init * BM50_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
-BM70_init = ( KTT_init * H20_init * BM60_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
-BM80_init = ( KTT_init * H20_init * BM70_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
-BM90_init = ( KTT_init * H20_init * BM80_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
-
-# arms initial conditions
-ABS  = 0
-
-# CENT
-AC0_init = CP0_init * VD_init
-NT0_init  = BM10_init + BM20_init + BM30_init + BM40_init + BM50_init + BM60_init + BM70_init + BM80_init + BM90_init + NB0_init
-RTOT0_init = KSI_init*NT0_init
-ADR0_init  = RTOT0_init*AC0_init/(KD_init+CP0_init)
-CENT = AC0_init + ADR0_init
-
-FRR  = 0
-DR   = 0
-B1   = BM10_init
-B2   = BM20_init
-B3   = BM30_init
-B4   = BM40_init
-B5   = BM50_init
-B6   = BM60_init
-B7   = BM70_init
-B8   = BM80_init
-B9   = BM90_init
-NB   = NB0_init
-
-cond_init_arms = list( "ABS" = 0, 
-                       "CENT" = AC0_init + ADR0_init, 
-                       "FRR"  = 0,
-                       "DR"   = 0,
-                       "B1"   = BM10_init,
-                       "B2"   = BM20_init,
-                       "B3"   = BM30_init,
-                       "B4"   = BM40_init,
-                       "B5"   = BM50_init,
-                       "B6"   = BM60_init,
-                       "B7"   = BM70_init,
-                       "B8"   = BM80_init,
-                       "B9"   = BM90_init,
-                       "NB"   = NB0_init )
-
-arm1 = Arm( name="arm1", arm_size = 10, cond_init = cond_init_arms )
-arm2 = Arm( name="arm2", arm_size = 10, cond_init = cond_init_arms )
-arm3 = Arm( name="arm3", arm_size = 10, cond_init = cond_init_arms )
-arm4 = Arm( name="arm4", arm_size = 10, cond_init = cond_init_arms )
-arm5 = Arm( name="arm5", arm_size = 10, cond_init = cond_init_arms )
-arm6 = Arm( name="arm6", arm_size = 10, cond_init = cond_init_arms )
+arm1 = Arm( name="arm1", arm_size = 10, cond_init = cond_init_arm1 )
+arm2 = Arm( name="arm2", arm_size = 10, cond_init = cond_init_arm2 )
+arm3 = Arm( name="arm3", arm_size = 10, cond_init = cond_init_arm3 )
+arm4 = Arm( name="arm4", arm_size = 10, cond_init = cond_init_arm4 )
+arm5 = Arm( name="arm5", arm_size = 10, cond_init = cond_init_arm5 )
+arm6 = Arm( name="arm6", arm_size = 10, cond_init = cond_init_arm6 )
 
 pk_dense = c(0.167, 0.25, 0.333, 0.5, 0.667, 0.75,  0.833, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12, 14, 16, 18, 20, 24)
 anc_dense = c(0.333, 0.5, 0.667, 0.75, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12, 14, 16, 18, 20, 24)
@@ -484,7 +502,7 @@ arm6 = addSampling( arm6, SamplingTimes( outcome = "RespPK",
                                          initialTime = 0 ) )
 
 arm6 = addSampling( arm6, SamplingTimes( outcome = "RespPD", 
-                                         sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                   initialTime = 0 ) )
+                                         sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                    initialTime = 0 ) )
 # Add administration
 arm1 = addAdministration( arm1,  Administration( outcome = "RespPK", tau = 24,  amount_dose = WT * c(0.1) ) )
 arm2 = addAdministration( arm2,  Administration( outcome = "RespPK", tau = 24,  amount_dose = WT * c(0.3) ) )
