@@ -1,0 +1,474 @@
+---
+title: "slide_44"
+fig: no crop
+geometry: left=1mm, right=1mm, top=1mm, bottom=1mm, asymmetric
+indent: TRUE
+output:
+  html_document:
+    df_print: paged
+    fig_caption: yes
+    output: 
+    highlight: textmate
+  word_document: default
+  pdf_document: default
+header-includes: 
+    - \usepackage{placeins}
+    - \usepackage{indentfirst}
+    - \usepackage{setspace}\spacing
+    - \usepackage{lineno}
+    - \linenumbers
+---
+
+```{r setup, include=FALSE, eval=TRUE}
+knitr::opts_chunk$set(echo = TRUE,fig.retina = 2, fig.align="center")
+options(kableExtra.latex.load_packages = FALSE)
+```
+
+```{r PFIMProject, eval=TRUE, asis = TRUE}
+# Create PFIM project
+MyProject = PFIMProject( name = "filgrastim" )
+```
+
+```{r StatisticalModel, echo = FALSE, asis = TRUE}
+# Create the statistical model
+MyStatisticalModel = StatisticalModel()
+```
+
+```{r constantParameters, echo = FALSE, asis = TRUE}
+
+# weight
+WT = 75
+
+## [PARAM] 
+ROUT  = 0
+BAS = 0.0246
+
+## [THETA]
+THETA1 = 6.26E-01  #1
+THETA2 = 6.42E-01  #2
+THETA3 = 1.00E+00  #3
+THETA4 = 6.77E+00  #4
+THETA5 = 1.48E-01  #5
+THETA6 = 2.56E+00  #6
+THETA7 = 1.27E+00  #7
+THETA8 = 1.01E-01  #8
+THETA9 = 2.11E-01  #9
+THETA10 = 0.00E+00  #10
+THETA11 = 7.23E-02  #11
+THETA12 = 0.00E+00  #12
+THETA13 = 1.02E-02  #13
+THETA14 = 1.65E+00  #14
+THETA15 = 3.21E+00  #15
+THETA16 = 3.43E+01  #16
+THETA17 = 3.23E+01  #17
+THETA18 = 0.00E+00  #18
+
+##  [MAIN]
+FF    = THETA1
+FR    = THETA3
+D2    = THETA4
+KOFF  = THETA10
+KBB1  = THETA12
+SM3   = THETA18
+#KD    = THETA7
+#KINT  = THETA8
+#KMT   = THETA11
+#KTT   = THETA13
+CP0   = BAS
+
+KA = ModelParameter( "KA", mu = 6.42E-01,
+                     omega = sqrt( 0.00E+00 ),
+                     fixedMu = FALSE,
+                     fixedOmega = TRUE,
+                     distribution = LogNormalDistribution() )
+
+KEL = ModelParameter( "KEL", mu = 1.48E-01,
+                      omega = sqrt( 3.12E-01),
+                      fixedMu = FALSE,
+                      fixedOmega = FALSE,
+                      distribution = LogNormalDistribution() )
+
+VD = ModelParameter( "VD", mu = 2.56E+00,
+                     omega = sqrt( 3.28E-01 ),
+                     fixedMu = FALSE,
+                     fixedOmega = FALSE,
+                     distribution = LogNormalDistribution() )
+
+KD = ModelParameter( "KD ", mu = THETA7,
+                     omega = sqrt( 0 ),
+                     fixedMu = FALSE,
+                     fixedOmega = TRUE,
+                     distribution = LogNormalDistribution() )
+
+KINT = ModelParameter( "KINT ", mu = THETA8,
+                       omega = sqrt( 0 ),
+                       fixedMu = FALSE,
+                       fixedOmega = TRUE,
+                       distribution = LogNormalDistribution() )
+
+KSI = ModelParameter( "KSI", mu = 2.11E-01,
+                      omega = sqrt( 2.24E-01 ),
+                      fixedMu = FALSE,
+                      fixedOmega = FALSE,
+                      distribution = LogNormalDistribution() )
+
+KMT = ModelParameter( "KMT", mu = THETA11,
+                      omega = sqrt( 0 ),
+                      fixedMu = FALSE,
+                      fixedOmega = TRUE,
+                      distribution = LogNormalDistribution() )
+
+KTT = ModelParameter( "KTT", mu = THETA13,
+                      omega = sqrt( 0 ),
+                      fixedMu = FALSE,
+                      fixedOmega = TRUE,
+                      distribution = LogNormalDistribution() )
+
+NB0 = ModelParameter( "NB0", mu = 1.65E+00,
+                      omega = sqrt( 2.98E-01 ),
+                      fixedMu = FALSE,
+                      fixedOmega = FALSE,
+                      distribution = LogNormalDistribution() )
+
+SC1 = ModelParameter( "SC1", mu = 3.21E+00,
+                      omega = sqrt(  8.03E-01 ),
+                      fixedMu = FALSE,
+                      fixedOmega = FALSE,
+                      distribution = LogNormalDistribution() )
+
+SM1 = ModelParameter( "SM1", mu = 3.43E+01,
+                      omega = sqrt( 1.28E-02 ),
+                      fixedMu = FALSE,
+                      fixedOmega = FALSE,
+                      distribution = LogNormalDistribution() )
+
+SM2 = ModelParameter( "SM2", mu = 3.23E+01,
+                      omega = sqrt( 0.0 ),
+                      fixedMu = FALSE,
+                      fixedOmega = TRUE,
+                      distribution = LogNormalDistribution() )
+
+# Assign the parameters to the statistical model
+MyStatisticalModel = defineParameter( MyStatisticalModel, KA )
+MyStatisticalModel = defineParameter( MyStatisticalModel, KEL )
+MyStatisticalModel = defineParameter( MyStatisticalModel, VD )
+MyStatisticalModel = defineParameter( MyStatisticalModel, KD )
+MyStatisticalModel = defineParameter( MyStatisticalModel, KINT )
+MyStatisticalModel = defineParameter( MyStatisticalModel, KSI )
+MyStatisticalModel = defineParameter( MyStatisticalModel, KMT )
+MyStatisticalModel = defineParameter( MyStatisticalModel, KTT )
+MyStatisticalModel = defineParameter( MyStatisticalModel, NB0 )
+MyStatisticalModel = defineParameter( MyStatisticalModel, SC1 )
+MyStatisticalModel = defineParameter( MyStatisticalModel, SM1 )
+MyStatisticalModel = defineParameter( MyStatisticalModel, SM2 )
+```
+
+```{r ModelVariable, echo = FALSE, asis = TRUE}
+# Define the variables of the ode model
+ABS = ModelVariable( "ABS" )
+CENT = ModelVariable( "CENT" )
+FRR = ModelVariable( "FRR" )
+DR = ModelVariable( "DR" )
+B1 = ModelVariable( "B1" )
+B2 = ModelVariable( "B2" )
+B3 = ModelVariable( "B3" )
+B4 = ModelVariable( "B4" )
+B5 = ModelVariable( "B5" )
+B6 = ModelVariable( "B6" )
+B7 = ModelVariable( "B7" )
+B8 = ModelVariable( "B8" )
+B9 = ModelVariable( "B9" )
+NB = ModelVariable( "NB" )
+
+MyStatisticalModel = defineVariable( MyStatisticalModel, ABS )
+MyStatisticalModel = defineVariable( MyStatisticalModel, CENT )
+MyStatisticalModel = defineVariable( MyStatisticalModel, FRR )
+MyStatisticalModel = defineVariable( MyStatisticalModel, DR )
+MyStatisticalModel = defineVariable( MyStatisticalModel, B1 )
+MyStatisticalModel = defineVariable( MyStatisticalModel, B2 )
+MyStatisticalModel = defineVariable( MyStatisticalModel, B3 )
+MyStatisticalModel = defineVariable( MyStatisticalModel, B4 )
+MyStatisticalModel = defineVariable( MyStatisticalModel, B5 )
+MyStatisticalModel = defineVariable( MyStatisticalModel, B6 )
+MyStatisticalModel = defineVariable( MyStatisticalModel, B7 )
+MyStatisticalModel = defineVariable( MyStatisticalModel, B8 )
+MyStatisticalModel = defineVariable( MyStatisticalModel, B9 )
+MyStatisticalModel = defineVariable( MyStatisticalModel, NB )
+```
+
+```{r ModelEquations, echo = FALSE, asis = TRUE}
+
+## ---------------------------------------
+## Deriv_CENT
+## ---------------------------------------
+
+NT = quote(B1+B2+B3+B4+B5+B6+B7+B8+B9+NB)
+RTOT = quote(KSI*NT)
+ADR_substitute = quote(RTOT*AC/(KD+CP))
+Deriv_CENT = expression( KA * ABS  + KIN - KEL * AC - KINT * ADR )
+Deriv_CENT = do.call('substitute', list(Deriv_CENT[[1]], list(ADR=ADR_substitute)))
+
+## ---------------------------------------
+## Deriv_B1
+## ---------------------------------------
+
+Deriv_B1 = expression( KINB* H1*(B1/BM10) - KBB1 * H3 * B1 - KTT * H2 * B1 )
+
+# KINB
+H10_substitute = quote(1.0 + SM1 * CP0 / (SC1 + CP0))
+KINB = expression(KMT * NB0 / H10)
+KINB = do.call( 'substitute', list( KINB[[1]], list( H10 = H10_substitute)))
+KINB_substitute = quote( KINB )
+
+# H1
+H1_substitute =  quote(1.0 + SM1 * CP / (SC1 + CP))
+
+# H2
+H2_substitute =  quote(1.0 + SM2 * CP / (SC1 + CP))
+
+# H3
+H3_substitute =  quote(1.0 + SM3 * CP / (SC1 + CP))
+
+# BM10
+H20_substitute = quote(1.0 + SM2 * CP0 / (SC1 + CP0))
+H30_substitute = quote(1.0 + SM3 * CP0 / (SC1 + CP0))
+
+BM10 = expression(KINB * H10 / (KBB1 * H30 + KTT * H20))
+
+BM10 = do.call( 'substitute', list( BM10[[1]], list( KINB = KINB_substitute, 
+                                                     H10 = H10_substitute, 
+                                                     H20 = H20_substitute,
+                                                     H30 = H30_substitute ) ) )
+
+BM10_substitute =  quote( BM10 )
+
+Deriv_B1 = do.call('substitute', list(Deriv_B1[[1]], list( KINB = KINB_substitute,
+                                                           H1 = H1_substitute,
+                                                           H2 = H2_substitute,
+                                                           H3 = H3_substitute,
+                                                           BM10 = BM10_substitute ) ) )
+## ---------------------------------------
+## Deriv_B2 ... Deriv_B9
+## ---------------------------------------
+
+Deriv_B2 = expression( KTT * H2 * B1 - KBB1 * H3 * B2 - KTT * H2 * B2 )
+Deriv_B3 = expression( KTT * H2 * B2 - KBB1 * H3 * B3 - KTT * H2 * B3 )
+Deriv_B4 = expression( KTT * H2 * B3 - KBB1 * H3 * B4 - KTT * H2 * B4 )
+Deriv_B5 = expression( KTT * H2 * B4 - KBB1 * H3 * B5 - KTT * H2 * B5 )
+Deriv_B6 = expression( KTT * H2 * B5 - KBB1 * H3 * B6 - KTT * H2 * B6 )
+Deriv_B7 = expression( KTT * H2 * B6 - KBB1 * H3 * B7 - KTT * H2 * B7 )
+Deriv_B8 = expression( KTT * H2 * B7 - KBB1 * H3 * B8 - KTT * H2 * B8 )
+Deriv_B9 = expression( KTT * H2 * B8 - KBB1 * H3 * B9 - KTT * H2 * B9 )
+
+Deriv_B2 = do.call('substitute', list(Deriv_B2[[1]], list( H1 = H1_substitute,
+                                                           H2 = H2_substitute,
+                                                           H3 = H3_substitute ) ) )
+
+Deriv_B3 = do.call('substitute', list(Deriv_B3[[1]], list( H1 = H1_substitute,
+                                                           H2 = H2_substitute,
+                                                           H3 = H3_substitute ) ) )
+
+Deriv_B4 = do.call('substitute', list(Deriv_B4[[1]], list( H1 = H1_substitute,
+                                                           H2 = H2_substitute,
+                                                           H3 = H3_substitute ) ) )
+
+Deriv_B5 = do.call('substitute', list(Deriv_B5[[1]], list( H1 = H1_substitute,
+                                                           H2 = H2_substitute,
+                                                           H3 = H3_substitute ) ) )
+
+Deriv_B6 = do.call('substitute', list(Deriv_B6[[1]], list( H1 = H1_substitute,
+                                                           H2 = H2_substitute,
+                                                           H3 = H3_substitute ) ) )
+
+Deriv_B7 = do.call('substitute', list(Deriv_B7[[1]], list( H1 = H1_substitute,
+                                                           H2 = H2_substitute,
+                                                           H3 = H3_substitute ) ) )
+
+Deriv_B8 = do.call('substitute', list(Deriv_B8[[1]], list( H1 = H1_substitute,
+                                                           H2 = H2_substitute,
+                                                           H3 = H3_substitute ) ) )
+
+Deriv_B9 = do.call('substitute', list(Deriv_B9[[1]], list( H1 = H1_substitute,
+                                                           H2 = H2_substitute,
+                                                           H3 = H3_substitute ) ) )
+
+## ---------------------------------------
+## Deriv_NB
+## ---------------------------------------
+
+Deriv_NB = expression( KTT * H2 * B9 + KBB1 * H3 *(B1+B2+B3+B4+B5+B6+B7+B8+B9)-KMT*NB ) 
+
+Deriv_NB = do.call('substitute', list(Deriv_NB[[1]], list( H2 = H2_substitute,
+                                                           H3 = H3_substitute ) ) )
+
+## ---------------------------------------
+## outputs: CP, RESP
+## ---------------------------------------
+
+ZNB = quote(NB)
+
+ZNT_substitute = quote(B1+B2+B3+B4+B5+B6+B7+B8+B9+NB)
+
+RRTOT = expression(KSI*ZNT)
+RRTOT_substitute = do.call('substitute', list(RRTOT[[1]], list( ZNT = ZNT_substitute ) ) )
+
+BBB = expression(RRTOT - CENT/VD + KD)
+BBB_substitute = do.call('substitute', list(BBB[[1]], list( RRTOT = RRTOT_substitute ) ) )
+
+ZCP = expression(0.5*(-BBB+sqrt((BBB**2.0) + 4*KD*CENT/VD)))
+ZCP = do.call('substitute', list(ZCP[[1]], list( BBB = BBB_substitute ) ) )
+
+MyModelEquations = ModelODEquations(
+  
+  list( RespPK = expression( ZCP ),
+        RespPD = expression( ZNB ) ),
+  
+  list( "Deriv_ABS"  = expression( - KA * ABS ),
+        "Deriv_CENT" = expression( Deriv_CENT ),
+        "Deriv_FRR"  = expression( 0 ),
+        "Deriv_DR"   = expression( 0 ),
+        "Deriv_B1"   = expression( Deriv_B1 ),
+        "Deriv_B2"   = expression( Deriv_B2 ),
+        "Deriv_B3"   = expression( Deriv_B3 ),
+        "Deriv_B4"   = expression( Deriv_B4 ),
+        "Deriv_B5"   = expression( Deriv_B5 ),
+        "Deriv_B6"   = expression( Deriv_B6 ),
+        "Deriv_B7"   = expression( Deriv_B7 ),
+        "Deriv_B8"   = expression( Deriv_B8 ),
+        "Deriv_B9"   = expression( Deriv_B9 ),
+        "Deriv_NB"   = expression( Deriv_NB ) ) )
+
+MyStatisticalModel = defineModelEquations( MyStatisticalModel, MyModelEquations )
+```
+
+```{r, echo = FALSE, asis = TRUE}
+# Assign the residual error to the statistical model
+MyStatisticalModel = addResponse( MyStatisticalModel, Response( "RespPK", 
+                                                                Proportional( sigma_inter = 0.0, sigma_slope = 2.53E-01 ) ) )
+
+MyStatisticalModel = addResponse( MyStatisticalModel, Response( "RespPD", 
+                                                                Proportional( sigma_inter = 2.10E+00, sigma_slope = 2.27E-02 ) ) )
+```
+
+
+```{r, echo = FALSE, asis = TRUE}
+
+# Assign the model to the project
+MyProject = defineStatisticalModel( MyProject, MyStatisticalModel )
+
+#define the design
+MyDesign = Design("MyDesignclozapine")
+
+# initial conditions
+cond_init = list("")
+
+H10 = expression( 1.0 + SM1 * CP0 / (SC1 + CP0 ) )
+H20 = expression( 1.0 + SM2 * CP0 / (SC1 + CP0 ) )
+H30 = expression( 1.0 + SM3 * CP0 / (SC1 + CP0 ) )
+
+BM10 = expression( KINB * H10 / (KBB1 * H30 + KTT * H20 ) )
+BM20 = expression( KTT * H20 * BM10/(KBB1 * H30 + KTT * H20 ) )
+BM30 = expression( KTT * H20 * BM20/(KBB1 * H30 + KTT * H20 ) )
+BM40 = expression( KTT * H20 * BM30/(KBB1 * H30 + KTT * H20 ) )
+BM50 = expression( KTT * H20 * BM40/(KBB1 * H30 + KTT * H20 ) )
+BM60 = expression( KTT * H20 * BM50/(KBB1 * H30 + KTT * H20 ) )
+BM70 = expression( KTT * H20 * BM60/(KBB1 * H30 + KTT * H20 ) )
+BM80 = expression( KTT * H20 * BM70/(KBB1 * H30 + KTT * H20 ) )
+BM90 = expression( KTT * H20 * BM80/(KBB1 * H30 + KTT * H20 ) )
+
+ABS  = 0
+AC0   = CP0 * VD
+CENT = AC0+ADR0
+FRR  = 0
+DR   = 0
+B1   = BM10
+B2   = BM20
+B3   = BM30
+B4   = BM40
+B5   = BM50
+B6   = BM60
+B7   = BM70
+B8   = BM80
+B9   = BM90
+NB   = NB0
+
+
+
+
+
+
+
+arm1 = Arm( name="arm1", arm_size = 10, cond_init = list( "compt"=0, "C2"= 0 ) )
+arm2 = Arm( name="arm2", arm_size = 10, cond_init = list( "compt"=0, "C2"= 0 ) )
+arm3 = Arm( name="arm3", arm_size = 10, cond_init = list( "compt"=0, "C2"= 0 ) )
+arm4 = Arm( name="arm4", arm_size = 10, cond_init = list( "compt"=0, "C2"= 0 ) )
+arm5 = Arm( name="arm5", arm_size = 10, cond_init = list( "compt"=0, "C2"= 0 ) )
+arm6 = Arm( name="arm6", arm_size = 10, cond_init = list( "compt"=0, "C2"= 0 ) )
+
+pk_dense = c(0.167, 0.25, 0.333, 0.5, 0.667, 0.75,  0.833, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12, 14, 16, 18, 20, 24)
+anc_dense = c(0.333, 0.5, 0.667, 0.75, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12, 14, 16, 18, 20, 24)
+
+arm1 = addSampling( arm1, SamplingTimes( outcome = "RespPK", 
+                                         sample_time = c( pk_dense, pk_dense + 6*24, 7*24 + c(4, 24, 48) ), 
+                                         initialTime = 0 ) )
+
+arm1 = addSampling( arm1, SamplingTimes( outcome = "RespPD", 
+                                         sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                   initialTime = 0 ) )
+
+arm2 = addSampling( arm2, SamplingTimes( outcome = "RespPK", 
+                                         sample_time = c( pk_dense, pk_dense + 6*24, 7*24 + c(4, 24, 48) ), 
+                                         initialTime = 0 ) )
+
+arm2 = addSampling( arm2, SamplingTimes( outcome = "RespPD", 
+                                         sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                   initialTime = 0 ) )
+
+arm3 = addSampling( arm3, SamplingTimes( outcome = "RespPK", 
+                                         sample_time = c( pk_dense, pk_dense + 6*24, 7*24 + c(4, 24, 48) ), 
+                                         initialTime = 0 ) )
+
+arm3 = addSampling( arm3, SamplingTimes( outcome = "RespPD", 
+                                         sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                   initialTime = 0 ) )
+
+arm4 = addSampling( arm4, SamplingTimes( outcome = "RespPK", 
+                                         sample_time = c( pk_dense, pk_dense + 6*24, 7*24 + c(4, 24, 48) ), 
+                                         initialTime = 0 ) )
+
+arm4 = addSampling( arm4, SamplingTimes( outcome = "RespPD", 
+                                         sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                   initialTime = 0 ) )
+
+arm5 = addSampling( arm5, SamplingTimes( outcome = "RespPK", 
+                                         sample_time = c( pk_dense, pk_dense + 6*24, 7*24 + c(4, 24, 48) ), 
+                                         initialTime = 0 ) )
+
+arm5 = addSampling( arm5, SamplingTimes( outcome = "RespPD", 
+                                         sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                   initialTime = 0 ) )
+
+arm6 = addSampling( arm6, SamplingTimes( outcome = "RespPK", 
+                                         sample_time = c( pk_dense, pk_dense + 6*24, 7*24 + c(4, 24, 48) ), 
+                                         initialTime = 0 ) )
+
+arm6 = addSampling( arm6, SamplingTimes( outcome = "RespPD", 
+                                         sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                   initialTime = 0 ) )
+# Add administration
+arm1 = addAdministration( arm1,  Administration( outcome = "RespPK", tau = 24,  amount_dose = WT * c(0.1) ) )
+arm2 = addAdministration( arm2,  Administration( outcome = "RespPK", tau = 24,  amount_dose = WT * c(0.3) ) )
+arm3 = addAdministration( arm3,  Administration( outcome = "RespPK", tau = 24,  amount_dose = WT * c(1) ) )
+arm4 = addAdministration( arm4,  Administration( outcome = "RespPK", tau = 24,  amount_dose = WT * c(3) ) )
+arm5 = addAdministration( arm5,  Administration( outcome = "RespPK", tau = 24,  amount_dose = WT * c(10) ) )
+arm6 = addAdministration( arm6,  Administration( outcome = "RespPK", tau = 24,  amount_dose = WT * c(30) ) )
+
+MyDesign = addArm( MyDesign, arm1 )
+MyDesign = addArm( MyDesign, arm2 )
+MyDesign = addArm( MyDesign, arm3 )
+MyDesign = addArm( MyDesign, arm4 )
+MyDesign = addArm( MyDesign, arm5 )
+MyDesign = addArm( MyDesign, arm6 )
+
+#update the project with the design
+MyProject = addDesign( MyProject, MyDesign )
+
+evaluationPop = EvaluatePopulationFIM( MyProject )
+```
+
+
+
