@@ -359,116 +359,161 @@ MyProject = defineStatisticalModel( MyProject, MyStatisticalModel )
 #define the design
 MyDesign = Design("MyDesignclozapine")
 
+# -------------------------------------------------
 # initial conditions
-cond_init = list("")
+# -------------------------------------------------
 
-H10 = expression( 1.0 + SM1 * CP0 / (SC1 + CP0 ) )
-H20 = expression( 1.0 + SM2 * CP0 / (SC1 + CP0 ) )
-H30 = expression( 1.0 + SM3 * CP0 / (SC1 + CP0 ) )
+KA_init = THETA2 * exp( sqrt( 0.0 ) )
+KEL_init = THETA5* exp( sqrt( 3.12E-01 ) )
+VD_init = THETA6 * exp( sqrt( 3.28E-01 ) )
+KSI_init = THETA9 * exp( sqrt( 2.24E-01 ) )
+NB0_init = THETA14 * exp( sqrt( 2.98E-01 ) )
+SC1_init = THETA15 * exp( sqrt( 8.03E-01 ) )
+SM1_init = THETA16 * exp( sqrt( 1.28E-02 ) )
+SM2_init = THETA17 * exp( sqrt( 0 ) )
+SM3_init = THETA18  
 
-BM10 = expression( KINB * H10 / (KBB1 * H30 + KTT * H20 ) )
-BM20 = expression( KTT * H20 * BM10/(KBB1 * H30 + KTT * H20 ) )
-BM30 = expression( KTT * H20 * BM20/(KBB1 * H30 + KTT * H20 ) )
-BM40 = expression( KTT * H20 * BM30/(KBB1 * H30 + KTT * H20 ) )
-BM50 = expression( KTT * H20 * BM40/(KBB1 * H30 + KTT * H20 ) )
-BM60 = expression( KTT * H20 * BM50/(KBB1 * H30 + KTT * H20 ) )
-BM70 = expression( KTT * H20 * BM60/(KBB1 * H30 + KTT * H20 ) )
-BM80 = expression( KTT * H20 * BM70/(KBB1 * H30 + KTT * H20 ) )
-BM90 = expression( KTT * H20 * BM80/(KBB1 * H30 + KTT * H20 ) )
+BAS_init = 0.0246
+CP0_init = BAS_init
+KMT_init = THETA11
 
+H10_init = ( 1.0 + SM1_init * CP0_init / (SC1_init + CP0_init ) )
+H20_init = ( 1.0 + SM2_init * CP0_init / (SC1_init + CP0_init ) )
+H30_init = ( 1.0 + SM3_init * CP0_init/ (SC1_init + CP0_init ) )
+
+KINB_init = KMT_init * NB0_init / H10_init
+KBB1_init = THETA12
+KTT_init = THETA13
+KD_init = THETA7
+
+BM10_init = ( KINB_init * H10_init / (KBB1_init * H30_init + KTT_init * H20_init ) )
+BM20_init = ( KTT_init * H20_init * BM10_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
+BM30_init = ( KTT_init * H20_init * BM20_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
+BM40_init = ( KTT_init * H20_init * BM30_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
+BM50_init = ( KTT_init * H20_init * BM40_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
+BM60_init = ( KTT_init * H20_init * BM50_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
+BM70_init = ( KTT_init * H20_init * BM60_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
+BM80_init = ( KTT_init * H20_init * BM70_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
+BM90_init = ( KTT_init * H20_init * BM80_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
+
+# arms initial conditions
 ABS  = 0
-AC0   = CP0 * VD
-CENT = AC0+ADR0
+
+# CENT
+AC0_init = CP0_init * VD_init
+NT0_init  = BM10_init + BM20_init + BM30_init + BM40_init + BM50_init + BM60_init + BM70_init + BM80_init + BM90_init + NB0_init
+RTOT0_init = KSI_init*NT0_init
+ADR0_init  = RTOT0_init*AC0_init/(KD_init+CP0_init)
+CENT = AC0_init + ADR0_init
+
 FRR  = 0
 DR   = 0
-B1   = BM10
-B2   = BM20
-B3   = BM30
-B4   = BM40
-B5   = BM50
-B6   = BM60
-B7   = BM70
-B8   = BM80
-B9   = BM90
-NB   = NB0
+B1   = BM10_init
+B2   = BM20_init
+B3   = BM30_init
+B4   = BM40_init
+B5   = BM50_init
+B6   = BM60_init
+B7   = BM70_init
+B8   = BM80_init
+B9   = BM90_init
+NB   = NB0_init
 
 
-
-
-
-
-
-arm1 = Arm( name="arm1", arm_size = 10, cond_init = list( "compt"=0, "C2"= 0 ) )
-arm2 = Arm( name="arm2", arm_size = 10, cond_init = list( "compt"=0, "C2"= 0 ) )
-arm3 = Arm( name="arm3", arm_size = 10, cond_init = list( "compt"=0, "C2"= 0 ) )
-arm4 = Arm( name="arm4", arm_size = 10, cond_init = list( "compt"=0, "C2"= 0 ) )
-arm5 = Arm( name="arm5", arm_size = 10, cond_init = list( "compt"=0, "C2"= 0 ) )
-arm6 = Arm( name="arm6", arm_size = 10, cond_init = list( "compt"=0, "C2"= 0 ) )
-
-pk_dense = c(0.167, 0.25, 0.333, 0.5, 0.667, 0.75,  0.833, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12, 14, 16, 18, 20, 24)
-anc_dense = c(0.333, 0.5, 0.667, 0.75, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12, 14, 16, 18, 20, 24)
-
-arm1 = addSampling( arm1, SamplingTimes( outcome = "RespPK", 
-                                         sample_time = c( pk_dense, pk_dense + 6*24, 7*24 + c(4, 24, 48) ), 
-                                         initialTime = 0 ) )
-
-arm1 = addSampling( arm1, SamplingTimes( outcome = "RespPD", 
-                                         sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                   initialTime = 0 ) )
-
-arm2 = addSampling( arm2, SamplingTimes( outcome = "RespPK", 
-                                         sample_time = c( pk_dense, pk_dense + 6*24, 7*24 + c(4, 24, 48) ), 
-                                         initialTime = 0 ) )
-
-arm2 = addSampling( arm2, SamplingTimes( outcome = "RespPD", 
-                                         sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                   initialTime = 0 ) )
-
-arm3 = addSampling( arm3, SamplingTimes( outcome = "RespPK", 
-                                         sample_time = c( pk_dense, pk_dense + 6*24, 7*24 + c(4, 24, 48) ), 
-                                         initialTime = 0 ) )
-
-arm3 = addSampling( arm3, SamplingTimes( outcome = "RespPD", 
-                                         sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                   initialTime = 0 ) )
-
-arm4 = addSampling( arm4, SamplingTimes( outcome = "RespPK", 
-                                         sample_time = c( pk_dense, pk_dense + 6*24, 7*24 + c(4, 24, 48) ), 
-                                         initialTime = 0 ) )
-
-arm4 = addSampling( arm4, SamplingTimes( outcome = "RespPD", 
-                                         sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                   initialTime = 0 ) )
-
-arm5 = addSampling( arm5, SamplingTimes( outcome = "RespPK", 
-                                         sample_time = c( pk_dense, pk_dense + 6*24, 7*24 + c(4, 24, 48) ), 
-                                         initialTime = 0 ) )
-
-arm5 = addSampling( arm5, SamplingTimes( outcome = "RespPD", 
-                                         sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                   initialTime = 0 ) )
-
-arm6 = addSampling( arm6, SamplingTimes( outcome = "RespPK", 
-                                         sample_time = c( pk_dense, pk_dense + 6*24, 7*24 + c(4, 24, 48) ), 
-                                         initialTime = 0 ) )
-
-arm6 = addSampling( arm6, SamplingTimes( outcome = "RespPD", 
-                                         sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                   initialTime = 0 ) )
-# Add administration
-arm1 = addAdministration( arm1,  Administration( outcome = "RespPK", tau = 24,  amount_dose = WT * c(0.1) ) )
-arm2 = addAdministration( arm2,  Administration( outcome = "RespPK", tau = 24,  amount_dose = WT * c(0.3) ) )
-arm3 = addAdministration( arm3,  Administration( outcome = "RespPK", tau = 24,  amount_dose = WT * c(1) ) )
-arm4 = addAdministration( arm4,  Administration( outcome = "RespPK", tau = 24,  amount_dose = WT * c(3) ) )
-arm5 = addAdministration( arm5,  Administration( outcome = "RespPK", tau = 24,  amount_dose = WT * c(10) ) )
-arm6 = addAdministration( arm6,  Administration( outcome = "RespPK", tau = 24,  amount_dose = WT * c(30) ) )
-
-MyDesign = addArm( MyDesign, arm1 )
-MyDesign = addArm( MyDesign, arm2 )
-MyDesign = addArm( MyDesign, arm3 )
-MyDesign = addArm( MyDesign, arm4 )
-MyDesign = addArm( MyDesign, arm5 )
-MyDesign = addArm( MyDesign, arm6 )
-
-#update the project with the design
-MyProject = addDesign( MyProject, MyDesign )
-
-evaluationPop = EvaluatePopulationFIM( MyProject )
-```
-
-
-
+cond_init = list( "ABS" = 0, 
+                  "CENT" = AC0_init + ADR0_init, 
+                  FRR  = 0
+                  DR   = 0
+                  B1   = BM10_init
+                  B2   = BM20_init
+                  B3   = BM30_init
+                  B4   = BM40_init
+                  B5   = BM50_init
+                  B6   = BM60_init
+                  B7   = BM70_init
+                  B8   = BM80_init
+                  B9   = BM90_init
+                  NB   = NB0_init
+                  a
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                  arm1 = Arm( name="arm1", arm_size = 10, cond_init = list( "compt"=0, "C2"= 0 ) )
+                  arm2 = Arm( name="arm2", arm_size = 10, cond_init = list( "compt"=0, "C2"= 0 ) )
+                  arm3 = Arm( name="arm3", arm_size = 10, cond_init = list( "compt"=0, "C2"= 0 ) )
+                  arm4 = Arm( name="arm4", arm_size = 10, cond_init = list( "compt"=0, "C2"= 0 ) )
+                  arm5 = Arm( name="arm5", arm_size = 10, cond_init = list( "compt"=0, "C2"= 0 ) )
+                  arm6 = Arm( name="arm6", arm_size = 10, cond_init = list( "compt"=0, "C2"= 0 ) )
+                  
+                  pk_dense = c(0.167, 0.25, 0.333, 0.5, 0.667, 0.75,  0.833, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12, 14, 16, 18, 20, 24)
+                  anc_dense = c(0.333, 0.5, 0.667, 0.75, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12, 14, 16, 18, 20, 24)
+                  
+                  arm1 = addSampling( arm1, SamplingTimes( outcome = "RespPK", 
+                                                           sample_time = c( pk_dense, pk_dense + 6*24, 7*24 + c(4, 24, 48) ), 
+                                                           initialTime = 0 ) )
+                  
+                  arm1 = addSampling( arm1, SamplingTimes( outcome = "RespPD", 
+                                                           sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                   initialTime = 0 ) )
+                  
+                  arm2 = addSampling( arm2, SamplingTimes( outcome = "RespPK", 
+                                                           sample_time = c( pk_dense, pk_dense + 6*24, 7*24 + c(4, 24, 48) ), 
+                                                           initialTime = 0 ) )
+                  
+                  arm2 = addSampling( arm2, SamplingTimes( outcome = "RespPD", 
+                                                           sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                   initialTime = 0 ) )
+                  
+                  arm3 = addSampling( arm3, SamplingTimes( outcome = "RespPK", 
+                                                           sample_time = c( pk_dense, pk_dense + 6*24, 7*24 + c(4, 24, 48) ), 
+                                                           initialTime = 0 ) )
+                  
+                  arm3 = addSampling( arm3, SamplingTimes( outcome = "RespPD", 
+                                                           sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                   initialTime = 0 ) )
+                  
+                  arm4 = addSampling( arm4, SamplingTimes( outcome = "RespPK", 
+                                                           sample_time = c( pk_dense, pk_dense + 6*24, 7*24 + c(4, 24, 48) ), 
+                                                           initialTime = 0 ) )
+                  
+                  arm4 = addSampling( arm4, SamplingTimes( outcome = "RespPD", 
+                                                           sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                   initialTime = 0 ) )
+                  
+                  arm5 = addSampling( arm5, SamplingTimes( outcome = "RespPK", 
+                                                           sample_time = c( pk_dense, pk_dense + 6*24, 7*24 + c(4, 24, 48) ), 
+                                                           initialTime = 0 ) )
+                  
+                  arm5 = addSampling( arm5, SamplingTimes( outcome = "RespPD", 
+                                                           sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                   initialTime = 0 ) )
+                  
+                  arm6 = addSampling( arm6, SamplingTimes( outcome = "RespPK", 
+                                                           sample_time = c( pk_dense, pk_dense + 6*24, 7*24 + c(4, 24, 48) ), 
+                                                           initialTime = 0 ) )
+                  
+                  arm6 = addSampling( arm6, SamplingTimes( outcome = "RespPD", 
+                                                           sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                   initialTime = 0 ) )
+                  # Add administration
+                  arm1 = addAdministration( arm1,  Administration( outcome = "RespPK", tau = 24,  amount_dose = WT * c(0.1) ) )
+                  arm2 = addAdministration( arm2,  Administration( outcome = "RespPK", tau = 24,  amount_dose = WT * c(0.3) ) )
+                  arm3 = addAdministration( arm3,  Administration( outcome = "RespPK", tau = 24,  amount_dose = WT * c(1) ) )
+                  arm4 = addAdministration( arm4,  Administration( outcome = "RespPK", tau = 24,  amount_dose = WT * c(3) ) )
+                  arm5 = addAdministration( arm5,  Administration( outcome = "RespPK", tau = 24,  amount_dose = WT * c(10) ) )
+                  arm6 = addAdministration( arm6,  Administration( outcome = "RespPK", tau = 24,  amount_dose = WT * c(30) ) )
+                  
+                  MyDesign = addArm( MyDesign, arm1 )
+                  MyDesign = addArm( MyDesign, arm2 )
+                  MyDesign = addArm( MyDesign, arm3 )
+                  MyDesign = addArm( MyDesign, arm4 )
+                  MyDesign = addArm( MyDesign, arm5 )
+                  MyDesign = addArm( MyDesign, arm6 )
+                  
+                  #update the project with the design
+                  MyProject = addDesign( MyProject, MyDesign )
+                  
+                  evaluationPop = EvaluatePopulationFIM( MyProject )
+                  ```
+                  
+                  
+                  
+                  
