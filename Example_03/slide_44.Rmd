@@ -90,13 +90,13 @@ pVD = ModelParameter( "VD", mu = 2.56E+00,
                       fixedOmega = FALSE,
                       distribution = LogNormalDistribution() )
 
-pKD = ModelParameter( "KD ", mu = THETA7,
+pKD = ModelParameter( "KD", mu = THETA7,
                       omega = sqrt( 0 ),
                       fixedMu = FALSE,
                       fixedOmega = TRUE,
                       distribution = LogNormalDistribution() )
 
-pKINT = ModelParameter( "KINT ", mu = THETA8,
+pKINT = ModelParameter( "KINT", mu = THETA8,
                         omega = sqrt( 0 ),
                         fixedMu = FALSE,
                         fixedOmega = TRUE,
@@ -204,12 +204,16 @@ BB =  quote( RTOT-ATOT/VD+KD )
 BB = do.call('substitute', list( BB, list( RTOT = RTOT,
                                            ATOT = ATOT) ) )
 
-CP =  quote( 0.5*(-BB+sqrt(pow(BB,2.0)+4*KD*ATOT/VD)) )
+CP = quote( 0.5*(-BB+sqrt(BB**2.0)+4*KD*ATOT/VD)) 
 CP = do.call('substitute', list( CP, list( BB = BB,
                                            ATOT = ATOT ) ) )
 
+AC = quote( CP*VD )
+AC = do.call('substitute', list( AC, list( CP = CP ) ) )
+
 ADR = quote( RTOT*AC/( KD+CP ) )
 ADR = do.call('substitute', list( ADR, list( RTOT = RTOT,
+                                             AC = AC,
                                              CP = CP ) ) )
 
 ## ---------------------------------------
@@ -225,10 +229,13 @@ KINB = do.call( 'substitute', list( KINB, list( H10 = H10 ) ) )
 
 # H1
 H1 = quote( 1.0 + SM1 * CP / ( SC1 + CP) )
+H1 = do.call('substitute', list( H1, list( CP = CP ) ) )
 # H2
 H2 = quote( 1.0 + SM2 * CP / ( SC1 + CP) )
+H2 = do.call('substitute', list( H2, list( CP = CP ) ) )
 # H3
 H3 = quote(1.0 + SM3 * CP / ( SC1 + CP) )
+H3 = do.call('substitute', list( H3, list( CP = CP ) ) )
 
 # BM10
 H20 = quote( 1.0 + SM2 * CP0 / ( SC1 + CP0 ) )
@@ -321,15 +328,16 @@ AC0 = do.call( 'substitute', list( AC0, list( CP0 = CP0 ) ) )
 
 ADR0  = quote(RTOT0*AC0/(KD+CP0))
 ADR0 = do.call( 'substitute', list( ADR0, list( RTOT0 = RTOT0,
+                                                AC0 = AC0,
                                                 CP0 = CP0 ) ) )
 
-KIN   = quote(KEL * AC0 + KINT * ADR0)
-KIN = do.call( 'substitute', list( KIN, list( AC0 = RTOT0,
-                                              KINT = KINT,
+KIN  = quote(KEL * AC0 + KINT * ADR0)
+KIN = do.call( 'substitute', list( KIN, list( AC0 = AC0,
                                               ADR0 = ADR0 ) ) )
 
 Deriv_CENT = quote( KA * ABS  + KIN - KEL * AC - KINT * ADR )
-Deriv_CENT = do.call('substitute', list( Deriv_CENT, list( KIN = KIN,
+Deriv_CENT = do.call('substitute', list( Deriv_CENT, list( AC = AC,
+                                                           KIN = KIN,
                                                            ADR = ADR ) ) )
 
 ## ---------------------------------------
@@ -404,8 +412,8 @@ ZCP = do.call('substitute', list(ZCP, list( BBB = BBB ) ) )
 
 MyModelEquations = ModelODEquations(
   
-  list( RespPK = expression( ZCP ),
-        RespPD = expression( ZNB ) ),
+  list( RespPK = as.expression( ZCP ),
+        RespPD = as.expression( ZNB ) ),
   
   list( "Deriv_ABS"  = expression( - KA * ABS ),
         "Deriv_CENT" = as.expression( Deriv_CENT ),
