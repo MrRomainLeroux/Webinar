@@ -70,7 +70,7 @@ SM3   = THETA18
 #KINT  = THETA8
 #KMT   = THETA11
 #KTT   = THETA13
-CP0   = BAS
+#CP0   = BAS
 
 KA = ModelParameter( "KA", mu = 6.42E-01,
                      omega = sqrt( 0.00E+00 ),
@@ -200,124 +200,124 @@ CP0_substitute = quote( dose_RespPK)
 ## Deriv_CENT
 ## ---------------------------------------
 
-NT = quote(B1+B2+B3+B4+B5+B6+B7+B8+B9+NB)
-RTOT = quote(KSI*NT)
-ADR_substitute = quote(RTOT*AC/(KD+CP))
-Deriv_CENT = expression( KA * ABS  + KIN - KEL * AC - KINT * ADR )
-Deriv_CENT = do.call('substitute', list(Deriv_CENT[[1]], list(ADR=ADR_substitute)))
+NT = quote( B1+B2+B3+B4+B5+B6+B7+B8+B9+NB )
+RTOT = quote( KSI*NT )
+RTOT = do.call('substitute', list( RTOT, list( NT = NT ) ) )
+
+ADR = quote( RTOT*AC/( KD+CP ) )
+ADR = do.call('substitute', list( ADR, list( RTOT = RTOT ) ) )
+
+Deriv_CENT = quote( KA * ABS  + KIN - KEL * AC - KINT * ADR )
+Deriv_CENT = do.call('substitute', list( Deriv_CENT, list( ADR = ADR ) ) )
 
 ## ---------------------------------------
 ## Deriv_B1
 ## ---------------------------------------
 
-Deriv_B1 = expression( KINB* H1*(B1/BM10) - KBB1 * H3 * B1 - KTT * H2 * B1 )
-
 # KINB
-H10_substitute = quote(1.0 + SM1 * CP0 / (SC1 + CP0))
-H10_substitute = do.call( 'substitute', list( KINB, list( CP0 = CP0_substitute ) ) )
+H10 = quote( 1.0 + SM1 * CP0 / (SC1 + CP0 ) )
+H10 = do.call( 'substitute', list( H10, list( CP0 = CP0_substitute ) ) )
 
-KINB = expression(KMT * NB0 / H10)
-KINB = do.call( 'substitute', list( KINB[[1]], list( H10 = H10_substitute)))
-KINB_substitute = quote( KINB )
+KINB = quote( KMT * NB0 / H10 )
+KINB = do.call( 'substitute', list( KINB, list( H10 = H10_substitute ) ) )
 
 # H1
-H1_substitute =  quote(1.0 + SM1 * CP / (SC1 + CP))
-
+H1 = quote( 1.0 + SM1 * CP / ( SC1 + CP) )
 # H2
-H2_substitute =  quote(1.0 + SM2 * CP / (SC1 + CP))
-
+H2 = quote( 1.0 + SM2 * CP / ( SC1 + CP) )
 # H3
-H3_substitute =  quote(1.0 + SM3 * CP / (SC1 + CP))
+H3 = quote(1.0 + SM3 * CP / ( SC1 + CP) )
 
 # BM10
-H20_substitute = quote(1.0 + SM2 * CP0 / (SC1 + CP0))
-H30_substitute = quote(1.0 + SM3 * CP0 / (SC1 + CP0))
+H20 = quote( 1.0 + SM2 * CP0 / ( SC1 + CP0 ) )
+H30 = quote( 1.0 + SM3 * CP0 / ( SC1 + CP0 ) )
 
-H20_substitute = do.call( 'substitute', list( H20_substitute, list( CP0 = CP0_substitute ) ) )
-H30_substitute = do.call( 'substitute', list( H30_substitute, list( CP0 = CP0_substitute ) ) )
+H20 = do.call( 'substitute', list( H20, list( CP0 = CP0_substitute ) ) )
+H30 = do.call( 'substitute', list( H30, list( CP0 = CP0_substitute ) ) )
 
+BM10 = quote( KINB * H10 / ( KBB1 * H30 + KTT * H20 ) )
 
-BM10 = expression(KINB * H10 / (KBB1 * H30 + KTT * H20))
+BM10 = do.call( 'substitute', list( BM10, list( KINB = KINB, 
+                                                H10 = H10, 
+                                                H20 = H10,
+                                                H30 = H10 ) ) )
 
-BM10 = do.call( 'substitute', list( BM10[[1]], list( KINB = KINB_substitute, 
-                                                     H10 = H10_substitute, 
-                                                     H20 = H20_substitute,
-                                                     H30 = H30_substitute ) ) )
+Deriv_B1 = quote( KINB* H1*(B1/BM10) - KBB1 * H3 * B1 - KTT * H2 * B1 )
 
-Deriv_B1 = do.call('substitute', list(Deriv_B1[[1]], list( KINB = KINB_substitute,
-                                                           H1 = H1_substitute,
-                                                           H2 = H2_substitute,
-                                                           H3 = H3_substitute,
-                                                           BM10 = BM10_substitute ) ) )
+Deriv_B1 = do.call('substitute', list(Deriv_B1, list( KINB = KINB,
+                                                      H1 = H1,
+                                                      H2 = H2,
+                                                      H3 = H3,
+                                                      BM10 = BM10 ) ) )
 ## ---------------------------------------
 ## Deriv_B2 ... Deriv_B9
 ## ---------------------------------------
 
-Deriv_B2 = expression( KTT * H2 * B1 - KBB1 * H3 * B2 - KTT * H2 * B2 )
-Deriv_B3 = expression( KTT * H2 * B2 - KBB1 * H3 * B3 - KTT * H2 * B3 )
-Deriv_B4 = expression( KTT * H2 * B3 - KBB1 * H3 * B4 - KTT * H2 * B4 )
-Deriv_B5 = expression( KTT * H2 * B4 - KBB1 * H3 * B5 - KTT * H2 * B5 )
-Deriv_B6 = expression( KTT * H2 * B5 - KBB1 * H3 * B6 - KTT * H2 * B6 )
-Deriv_B7 = expression( KTT * H2 * B6 - KBB1 * H3 * B7 - KTT * H2 * B7 )
-Deriv_B8 = expression( KTT * H2 * B7 - KBB1 * H3 * B8 - KTT * H2 * B8 )
-Deriv_B9 = expression( KTT * H2 * B8 - KBB1 * H3 * B9 - KTT * H2 * B9 )
+Deriv_B2 = quote( KTT * H2 * B1 - KBB1 * H3 * B2 - KTT * H2 * B2 )
+Deriv_B3 = quote( KTT * H2 * B2 - KBB1 * H3 * B3 - KTT * H2 * B3 )
+Deriv_B4 = quote( KTT * H2 * B3 - KBB1 * H3 * B4 - KTT * H2 * B4 )
+Deriv_B5 = quote( KTT * H2 * B4 - KBB1 * H3 * B5 - KTT * H2 * B5 )
+Deriv_B6 = quote( KTT * H2 * B5 - KBB1 * H3 * B6 - KTT * H2 * B6 )
+Deriv_B7 = quote( KTT * H2 * B6 - KBB1 * H3 * B7 - KTT * H2 * B7 )
+Deriv_B8 = quote( KTT * H2 * B7 - KBB1 * H3 * B8 - KTT * H2 * B8 )
+Deriv_B9 = quote( KTT * H2 * B8 - KBB1 * H3 * B9 - KTT * H2 * B9 )
 
-Deriv_B2 = do.call('substitute', list(Deriv_B2[[1]], list( H1 = H1_substitute,
-                                                           H2 = H2_substitute,
-                                                           H3 = H3_substitute ) ) )
+Deriv_B2 = do.call('substitute', list(Deriv_B2, list( H1 = H1_substitute,
+                                                      H2 = H2_substitute,
+                                                      H3 = H3_substitute ) ) )
 
-Deriv_B3 = do.call('substitute', list(Deriv_B3[[1]], list( H1 = H1_substitute,
-                                                           H2 = H2_substitute,
-                                                           H3 = H3_substitute ) ) )
+Deriv_B3 = do.call('substitute', list(Deriv_B3, list( H1 = H1_substitute,
+                                                      H2 = H2_substitute,
+                                                      H3 = H3_substitute ) ) )
 
-Deriv_B4 = do.call('substitute', list(Deriv_B4[[1]], list( H1 = H1_substitute,
-                                                           H2 = H2_substitute,
-                                                           H3 = H3_substitute ) ) )
+Deriv_B4 = do.call('substitute', list(Deriv_B4, list( H1 = H1_substitute,
+                                                      H2 = H2_substitute,
+                                                      H3 = H3_substitute ) ) )
 
-Deriv_B5 = do.call('substitute', list(Deriv_B5[[1]], list( H1 = H1_substitute,
-                                                           H2 = H2_substitute,
-                                                           H3 = H3_substitute ) ) )
+Deriv_B5 = do.call('substitute', list(Deriv_B5, list( H1 = H1_substitute,
+                                                      H2 = H2_substitute,
+                                                      H3 = H3_substitute ) ) )
 
-Deriv_B6 = do.call('substitute', list(Deriv_B6[[1]], list( H1 = H1_substitute,
-                                                           H2 = H2_substitute,
-                                                           H3 = H3_substitute ) ) )
+Deriv_B6 = do.call('substitute', list(Deriv_B6, list( H1 = H1_substitute,
+                                                      H2 = H2_substitute,
+                                                      H3 = H3_substitute ) ) )
 
-Deriv_B7 = do.call('substitute', list(Deriv_B7[[1]], list( H1 = H1_substitute,
-                                                           H2 = H2_substitute,
-                                                           H3 = H3_substitute ) ) )
+Deriv_B7 = do.call('substitute', list(Deriv_B7, list( H1 = H1_substitute,
+                                                      H2 = H2_substitute,
+                                                      H3 = H3_substitute ) ) )
 
-Deriv_B8 = do.call('substitute', list(Deriv_B8[[1]], list( H1 = H1_substitute,
-                                                           H2 = H2_substitute,
-                                                           H3 = H3_substitute ) ) )
+Deriv_B8 = do.call('substitute', list(Deriv_B8, list( H1 = H1_substitute,
+                                                      H2 = H2_substitute,
+                                                      H3 = H3_substitute ) ) )
 
-Deriv_B9 = do.call('substitute', list(Deriv_B9[[1]], list( H1 = H1_substitute,
-                                                           H2 = H2_substitute,
-                                                           H3 = H3_substitute ) ) )
+Deriv_B9 = do.call('substitute', list(Deriv_B9, list( H1 = H1_substitute,
+                                                      H2 = H2_substitute,
+                                                      H3 = H3_substitute ) ) )
 
 ## ---------------------------------------
 ## Deriv_NB
 ## ---------------------------------------
 
-Deriv_NB = expression( KTT * H2 * B9 + KBB1 * H3 *(B1+B2+B3+B4+B5+B6+B7+B8+B9)-KMT*NB ) 
+Deriv_NB = quote( KTT * H2 * B9 + KBB1 * H3 *(B1+B2+B3+B4+B5+B6+B7+B8+B9)-KMT*NB ) 
 
-Deriv_NB = do.call('substitute', list(Deriv_NB[[1]], list( H2 = H2_substitute,
-                                                           H3 = H3_substitute ) ) )
+Deriv_NB = do.call('substitute', list(Deriv_NB , list( H2 = H2_substitute,
+                                                       H3 = H3_substitute ) ) )
 
 ## ---------------------------------------
 ## outputs: CP, RESP
 ## ---------------------------------------
 
 ZNB = quote(NB)
-ZNT_substitute = quote(B1+B2+B3+B4+B5+B6+B7+B8+B9+NB)
+ZNT = quote(B1+B2+B3+B4+B5+B6+B7+B8+B9+NB)
 
-RRTOT = expression(KSI*ZNT)
-RRTOT_substitute = do.call('substitute', list(RRTOT[[1]], list( ZNT = ZNT_substitute ) ) )
+RRTOT = quote(KSI*ZNT)
+RRTOT = do.call('substitute', list(RRTOT, list( ZNT = ZNT ) ) )
 
-BBB = expression(RRTOT - CENT/VD + KD)
-BBB_substitute = do.call('substitute', list(BBB[[1]], list( RRTOT = RRTOT_substitute ) ) )
+BBB = quote(RRTOT - CENT/VD + KD)
+BBB = do.call('substitute', list(BBB, list( RRTOT = RRTOT ) ) )
 
-ZCP = expression(0.5*(-BBB+sqrt((BBB**2.0) + 4*KD*CENT/VD)))
-ZCP = do.call('substitute', list(ZCP[[1]], list( BBB = BBB_substitute ) ) )
+ZCP = quote(0.5*(-BBB+sqrt((BBB**2.0) + 4*KD*CENT/VD)))
+ZCP = do.call('substitute', list(ZCP, list( BBB = BBB ) ) )
 
 MyModelEquations = ModelODEquations(
   
@@ -325,19 +325,19 @@ MyModelEquations = ModelODEquations(
         RespPD = expression( ZNB ) ),
   
   list( "Deriv_ABS"  = expression( - KA * ABS ),
-        "Deriv_CENT" = expression( Deriv_CENT ),
-        "Deriv_FRR"  = expression( 0 ),
-        "Deriv_DR"   = expression( 0 ),
-        "Deriv_B1"   = expression( Deriv_B1 ),
-        "Deriv_B2"   = expression( Deriv_B2 ),
-        "Deriv_B3"   = expression( Deriv_B3 ),
-        "Deriv_B4"   = expression( Deriv_B4 ),
-        "Deriv_B5"   = expression( Deriv_B5 ),
-        "Deriv_B6"   = expression( Deriv_B6 ),
-        "Deriv_B7"   = expression( Deriv_B7 ),
-        "Deriv_B8"   = expression( Deriv_B8 ),
-        "Deriv_B9"   = expression( Deriv_B9 ),
-        "Deriv_NB"   = expression( Deriv_NB ) ) )
+        "Deriv_CENT" = as.expression( Deriv_CENT ),
+        "Deriv_FRR"  = as.expression( 0 ),
+        "Deriv_DR"   = as.expression( 0 ),
+        "Deriv_B1"   = as.expression( Deriv_B1 ),
+        "Deriv_B2"   = as.expression( Deriv_B2 ),
+        "Deriv_B3"   = as.expression( Deriv_B3 ),
+        "Deriv_B4"   = as.expression( Deriv_B4 ),
+        "Deriv_B5"   = as.expression( Deriv_B5 ),
+        "Deriv_B6"   = as.expression( Deriv_B6 ),
+        "Deriv_B7"   = as.expression( Deriv_B7 ),
+        "Deriv_B8"   = as.expression( Deriv_B8 ),
+        "Deriv_B9"   = as.expression( Deriv_B9 ),
+        "Deriv_NB"   = as.expression( Deriv_NB ) ) )
 
 MyStatisticalModel = defineModelEquations( MyStatisticalModel, MyModelEquations )
 ```
@@ -471,7 +471,7 @@ ADR0_init = do.call('substitute', list(ADR0_init, list( RTOT0_init = RTOT0_init,
 
 CENT_init = quote(AC0_init + ADR0_init)
 CENT_init = do.call('substitute', list(CENT, list( AC0_init = AC0_init,
-                                              ADR0_init = ADR0_init) ) )
+                                                   ADR0_init = ADR0_init) ) )
 
 FRR  = 0
 DR   = 0
