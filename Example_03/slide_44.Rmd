@@ -194,21 +194,13 @@ MyStatisticalModel = defineVariable( MyStatisticalModel, NB )
 
 ```{r ModelEquations, echo = FALSE, asis = TRUE}
 
-CP0_substitute = quote( dose_RespPK)
-
-## ---------------------------------------
-## Deriv_CENT
-## ---------------------------------------
+CP0 = quote( dose_RespPK)
 
 NT = quote( B1+B2+B3+B4+B5+B6+B7+B8+B9+NB )
 RTOT = quote( KSI*NT )
 RTOT = do.call('substitute', list( RTOT, list( NT = NT ) ) )
-
 ADR = quote( RTOT*AC/( KD+CP ) )
 ADR = do.call('substitute', list( ADR, list( RTOT = RTOT ) ) )
-
-Deriv_CENT = quote( KA * ABS  + KIN - KEL * AC - KINT * ADR )
-Deriv_CENT = do.call('substitute', list( Deriv_CENT, list( ADR = ADR ) ) )
 
 ## ---------------------------------------
 ## Deriv_B1
@@ -216,7 +208,7 @@ Deriv_CENT = do.call('substitute', list( Deriv_CENT, list( ADR = ADR ) ) )
 
 # KINB
 H10 = quote( 1.0 + SM1 * CP0 / (SC1 + CP0 ) )
-H10 = do.call( 'substitute', list( H10, list( CP0 = CP0_substitute ) ) )
+H10 = do.call( 'substitute', list( H10, list( CP0 = CP0 ) ) )
 
 KINB = quote( KMT * NB0 / H10 )
 KINB = do.call( 'substitute', list( KINB, list( H10 = H10 ) ) )
@@ -232,8 +224,8 @@ H3 = quote(1.0 + SM3 * CP / ( SC1 + CP) )
 H20 = quote( 1.0 + SM2 * CP0 / ( SC1 + CP0 ) )
 H30 = quote( 1.0 + SM3 * CP0 / ( SC1 + CP0 ) )
 
-H20 = do.call( 'substitute', list( H20, list( CP0 = CP0_substitute ) ) )
-H30 = do.call( 'substitute', list( H30, list( CP0 = CP0_substitute ) ) )
+H20 = do.call( 'substitute', list( H20, list( CP0 = CP0 ) ) )
+H30 = do.call( 'substitute', list( H30, list( CP0 = CP0 ) ) )
 
 BM10 = quote( KINB * H10 / ( KBB1 * H30 + KTT * H20 ) )
 
@@ -249,6 +241,88 @@ Deriv_B1 = do.call('substitute', list(Deriv_B1, list( KINB = KINB,
                                                       H2 = H2,
                                                       H3 = H3,
                                                       BM10 = BM10 ) ) )
+## ---------------------------------------
+## Deriv_CENT
+## ---------------------------------------
+
+BM10 = quote(KINB * H10 / (KBB1 * H30 + KTT * H20))
+BM10 = do.call( 'substitute', list( BM10, list( KINB = KINB,
+                                                H10 = H10,
+                                                H20 = H20,
+                                                H30 = H30 ) ) )
+
+BM20 = quote(KTT * H20 * BM10/(KBB1 * H30 + KTT * H20))
+BM20 = do.call( 'substitute', list( BM20, list( BM10 = BM10,
+                                                H20 = H20,
+                                                H30 = H30 ) ) )
+
+BM30 = quote(KTT * H20 * BM20/(KBB1 * H30 + KTT * H20))
+BM30 = do.call( 'substitute', list( BM30, list( BM20 = BM20,
+                                                H20 = H20,
+                                                H30 = H30 ) ) )
+
+
+BM40 = quote(KTT * H20 * BM30/(KBB1 * H30 + KTT * H20))
+BM40 = do.call( 'substitute', list( BM40, list( BM30 = BM30,
+                                                H20 = H20,
+                                                H30 = H30 ) ) ) 
+
+BM50 = quote(KTT * H20 * BM40/(KBB1 * H30 + KTT * H20))
+BM50 = do.call( 'substitute', list( BM50, list( BM40 = BM40,
+                                                H20 = H20,
+                                                H30 = H30 ) ) )
+
+BM60 = quote(KTT * H20 * BM50/(KBB1 * H30 + KTT * H20))
+BM60 = do.call( 'substitute', list( BM60, list( BM50 = BM50,
+                                                H20 = H20,
+                                                H30 = H30 ) ) )
+
+BM70 = quote(KTT * H20 * BM60/(KBB1 * H30 + KTT * H20))
+BM70 = do.call( 'substitute', list( BM70, list( BM60 = BM60,
+                                                H20 = H20,
+                                                H30 = H30 ) ) )
+
+BM80 = quote(KTT * H20 * BM70/(KBB1 * H30 + KTT * H20))
+BM80 = do.call( 'substitute', list( BM80, list( BM70 = BM70,
+                                                H20 = H20,
+                                                H30 = H30 ) ) )
+
+BM90 = quote(KTT * H20 * BM80/(KBB1 * H30 + KTT * H20))
+BM90 = do.call( 'substitute', list( BM90, list( BM80 = BM80,
+                                                H20 = H20,
+                                                H30 = H30 ) ) )
+
+NT0 = quote(BM10+BM20+BM30+BM40+BM50+BM60+BM70+BM80+BM90+NB0)
+NT0 = do.call( 'substitute', list( NT0, list(  BM10=BM10,
+                                               BM20=BM20,
+                                               BM30=BM30,
+                                               BM40=BM40,
+                                               BM50=BM50,
+                                               BM60=BM60,
+                                               BM70=BM70,
+                                               BM80=BM80,
+                                               BM90=BM90 ) ) )
+
+
+RTOT0 = quote(KSI*NT0)
+RTOT0 = do.call( 'substitute', list( RTOT0, list( NT0 = NT0 ) ) )
+
+AC0   = quote(CP0 * VD)
+AC0 = do.call( 'substitute', list( AC0, list( CP0 = CP0 ) ) )
+
+ADR0  = quote(RTOT0*AC0/(KD+CP0))
+ADR0 = do.call( 'substitute', list( ADR0, list( RTOT0 = RTOT0,
+                                                CP0 = CP0 ) ) )
+
+KIN   = quote(KEL * AC0 + KINT * ADR0)
+KIN = do.call( 'substitute', list( KIN, list( AC0 = RTOT0,
+                                              KINT = KINT,
+                                              ADR0 = ADR0 ) ) )
+
+Deriv_CENT = quote( KA * ABS  + KIN - KEL * AC - KINT * ADR )
+Deriv_CENT = do.call('substitute', list( Deriv_CENT, list( KIN = KIN,
+                                                           ADR = ADR ) ) )
+
 ## ---------------------------------------
 ## Deriv_B2 ... Deriv_B9
 ## ---------------------------------------
@@ -300,8 +374,8 @@ Deriv_B9 = do.call('substitute', list(Deriv_B9, list( H1 = H1,
 
 Deriv_NB = quote( KTT * H2 * B9 + KBB1 * H3 *(B1+B2+B3+B4+B5+B6+B7+B8+B9)-KMT*NB ) 
 
-Deriv_NB = do.call('substitute', list(Deriv_NB , list( H2 = H2_substitute,
-                                                       H3 = H3_substitute ) ) )
+Deriv_NB = do.call('substitute', list(Deriv_NB , list( H2 = H2,
+                                                       H3 = H3 ) ) )
 
 ## ---------------------------------------
 ## outputs: CP, RESP
