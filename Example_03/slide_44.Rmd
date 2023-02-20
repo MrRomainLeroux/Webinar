@@ -219,7 +219,7 @@ H10 = quote( 1.0 + SM1 * CP0 / (SC1 + CP0 ) )
 H10 = do.call( 'substitute', list( H10, list( CP0 = CP0_substitute ) ) )
 
 KINB = quote( KMT * NB0 / H10 )
-KINB = do.call( 'substitute', list( KINB, list( H10 = H10_substitute ) ) )
+KINB = do.call( 'substitute', list( KINB, list( H10 = H10 ) ) )
 
 # H1
 H1 = quote( 1.0 + SM1 * CP / ( SC1 + CP) )
@@ -262,37 +262,37 @@ Deriv_B7 = quote( KTT * H2 * B6 - KBB1 * H3 * B7 - KTT * H2 * B7 )
 Deriv_B8 = quote( KTT * H2 * B7 - KBB1 * H3 * B8 - KTT * H2 * B8 )
 Deriv_B9 = quote( KTT * H2 * B8 - KBB1 * H3 * B9 - KTT * H2 * B9 )
 
-Deriv_B2 = do.call('substitute', list(Deriv_B2, list( H1 = H1_substitute,
-                                                      H2 = H2_substitute,
-                                                      H3 = H3_substitute ) ) )
+Deriv_B2 = do.call('substitute', list(Deriv_B2, list( H1 = H1,
+                                                      H2 = H2,
+                                                      H3 = H3 ) ) )
 
-Deriv_B3 = do.call('substitute', list(Deriv_B3, list( H1 = H1_substitute,
-                                                      H2 = H2_substitute,
-                                                      H3 = H3_substitute ) ) )
+Deriv_B3 = do.call('substitute', list(Deriv_B3, list( H1 = H1,
+                                                      H2 = H2,
+                                                      H3 = H3 ) ) )
 
-Deriv_B4 = do.call('substitute', list(Deriv_B4, list( H1 = H1_substitute,
-                                                      H2 = H2_substitute,
-                                                      H3 = H3_substitute ) ) )
+Deriv_B4 = do.call('substitute', list(Deriv_B4, list( H1 = H1,
+                                                      H2 = H2,
+                                                      H3 = H3 ) ) )
 
-Deriv_B5 = do.call('substitute', list(Deriv_B5, list( H1 = H1_substitute,
-                                                      H2 = H2_substitute,
-                                                      H3 = H3_substitute ) ) )
+Deriv_B5 = do.call('substitute', list(Deriv_B5, list( H1 = H1,
+                                                      H2 = H2,
+                                                      H3 = H3 ) ) )
 
-Deriv_B6 = do.call('substitute', list(Deriv_B6, list( H1 = H1_substitute,
-                                                      H2 = H2_substitute,
-                                                      H3 = H3_substitute ) ) )
+Deriv_B6 = do.call('substitute', list(Deriv_B6, list( H1 = H1,
+                                                      H2 = H2,
+                                                      H3 = H3 ) ) )
 
-Deriv_B7 = do.call('substitute', list(Deriv_B7, list( H1 = H1_substitute,
-                                                      H2 = H2_substitute,
-                                                      H3 = H3_substitute ) ) )
+Deriv_B7 = do.call('substitute', list(Deriv_B7, list( H1 = H1,
+                                                      H2 = H2,
+                                                      H3 = H3 ) ) )
 
-Deriv_B8 = do.call('substitute', list(Deriv_B8, list( H1 = H1_substitute,
-                                                      H2 = H2_substitute,
-                                                      H3 = H3_substitute ) ) )
+Deriv_B8 = do.call('substitute', list(Deriv_B8, list( H1 = H1,
+                                                      H2 = H2,
+                                                      H3 = H3 ) ) )
 
-Deriv_B9 = do.call('substitute', list(Deriv_B9, list( H1 = H1_substitute,
-                                                      H2 = H2_substitute,
-                                                      H3 = H3_substitute ) ) )
+Deriv_B9 = do.call('substitute', list(Deriv_B9, list( H1 = H1,
+                                                      H2 = H2,
+                                                      H3 = H3 ) ) )
 
 ## ---------------------------------------
 ## Deriv_NB
@@ -363,6 +363,7 @@ MyDesign = Design("MyDesignclozapine")
 # initial conditions
 # -------------------------------------------------
 
+# initial values
 KA_init = THETA2 * exp( sqrt( 0.0 ) )
 KEL_init = THETA5* exp( sqrt( 3.12E-01 ) )
 VD_init = THETA6 * exp( sqrt( 3.28E-01 ) )
@@ -378,6 +379,7 @@ KBB1_init = THETA12
 KTT_init = THETA13
 KD_init = THETA7
 
+# expressions with dose RespPK
 H10_init = quote( 1.0 + SM1_init * dose_RespPK / (SC1_init + dose_RespPK ) )
 H20_init = quote( 1.0 + SM2_init * dose_RespPK / (SC1_init + dose_RespPK ) )
 H30_init = quote( 1.0 + SM3_init * dose_RespPK / (SC1_init + dose_RespPK ) )
@@ -470,8 +472,8 @@ ADR0_init = do.call('substitute', list(ADR0_init, list( RTOT0_init = RTOT0_init,
                                                         AC0_init = AC0_init) ) )
 
 CENT_init = quote(AC0_init + ADR0_init)
-CENT_init = do.call('substitute', list(CENT, list( AC0_init = AC0_init,
-                                                   ADR0_init = ADR0_init) ) )
+CENT_init = do.call('substitute', list(CENT_init, list( AC0_init = AC0_init,
+                                                        ADR0_init = ADR0_init) ) )
 
 FRR  = 0
 DR   = 0
@@ -486,27 +488,27 @@ B8   = BM80_init
 B9   = BM90_init
 NB   = NB0_init
 
-cond_init_arms = list( "ABS" = expression(0), 
-                       "CENT" = expression(CENT_init), 
-                       "FRR"  = expression(0),
-                       "DR"   = expression(0),
-                       "B1"   = expression(BM10_init),
-                       "B2"   = expression(BM20_init),
-                       "B3"   = expression(BM30_init),
-                       "B4"   = expression(BM40_init),
-                       "B5"   = expression(BM50_init),
-                       "B6"   = expression(BM60_init),
-                       "B7"   = expression(BM70_init),
-                       "B8"   = expression(BM80_init),
-                       "B9"   = expression(BM90_init),
-                       "NB"   = expression(NB0_init ) )
+cond_init_arms = list( "ABS" = as.expression(0), 
+                       "CENT" = as.expression(CENT_init), 
+                       "FRR"  = as.expression(0),
+                       "DR"   = as.expression(0),
+                       "B1"   = as.expression(BM10_init),
+                       "B2"   = as.expression(BM20_init),
+                       "B3"   = as.expression(BM30_init),
+                       "B4"   = as.expression(BM40_init),
+                       "B5"   = as.expression(BM50_init),
+                       "B6"   = as.expression(BM60_init),
+                       "B7"   = as.expression(BM70_init),
+                       "B8"   = as.expression(BM80_init),
+                       "B9"   = as.expression(BM90_init),
+                       "NB"   = as.expression(NB0_init ) )
 
-arm1 = Arm( name = "arm1", arm_size = 10, cond_init = cond_init_arm1 )
-arm2 = Arm( name = "arm2", arm_size = 10, cond_init = cond_init_arm2 )
-arm3 = Arm( name = "arm3", arm_size = 10, cond_init = cond_init_arm3 )
-arm4 = Arm( name = "arm4", arm_size = 10, cond_init = cond_init_arm4 )
-arm5 = Arm( name = "arm5", arm_size = 10, cond_init = cond_init_arm5 )
-arm6 = Arm( name = "arm6", arm_size = 10, cond_init = cond_init_arm6 )
+arm1 = Arm( name = "arm1", arm_size = 10, cond_init = cond_init_arms )
+arm2 = Arm( name = "arm2", arm_size = 10, cond_init = cond_init_arms )
+arm3 = Arm( name = "arm3", arm_size = 10, cond_init = cond_init_arms )
+arm4 = Arm( name = "arm4", arm_size = 10, cond_init = cond_init_arms )
+arm5 = Arm( name = "arm5", arm_size = 10, cond_init = cond_init_arms )
+arm6 = Arm( name = "arm6", arm_size = 10, cond_init = cond_init_arms )
 
 pk_dense = c(0.167, 0.25, 0.333, 0.5, 0.667, 0.75,  0.833, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12, 14, 16, 18, 20, 24)
 anc_dense = c(0.333, 0.5, 0.667, 0.75, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12, 14, 16, 18, 20, 24)
