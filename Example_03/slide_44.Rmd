@@ -33,9 +33,10 @@ MyProject = PFIMProject( name = "filgrastim" )
 # Create the statistical model
 MyStatisticalModel = StatisticalModel()
 
-MyStatisticalModel = setParametersOdeSolver( MyStatisticalModel, list( atol=1e-8,
-                                                                       rtol=1e-8,
-                                                                       .relStep=1e-8 ) )
+MyStatisticalModel = setParametersOdeSolver( MyStatisticalModel, list( atol=1e-4,
+                                                                       rtol=1e-4,
+                                                                       .relStep=1e-4 ) )
+
 ```
 
 ```{r constantParameters, echo = FALSE, asis = TRUE}
@@ -64,7 +65,7 @@ THETA17 = 3.23E+01  #17
 THETA18 = 0.00E+00  #18
 
 ##  [MAIN]
-FF    = THETA1
+#FF    = THETA1
 FR    = THETA3
 D2    = THETA4
 KOFF  = THETA10
@@ -76,25 +77,25 @@ SM3   = THETA18
 #KTT   = THETA13
 #CP0   = BAS
 
-pFF = ModelParameter( "FF", mu =THETA1,
+pFF = ModelParameter( "FF", mu = THETA1,
                       omega = sqrt( 0.00E+00 ),
                       fixedMu = FALSE,
                       fixedOmega = TRUE,
                       distribution = LogNormalDistribution() )
 
-pKA = ModelParameter( "KA", mu = 6.42E-01,
+pKA = ModelParameter( "KA", mu = THETA2,
                       omega = sqrt( 0.00E+00 ),
                       fixedMu = FALSE,
                       fixedOmega = TRUE,
                       distribution = LogNormalDistribution() )
 
-pKEL = ModelParameter( "KEL", mu = 1.48E-01,
+pKEL = ModelParameter( "KEL", mu = THETA5,
                        omega = sqrt( 3.12E-01),
                        fixedMu = FALSE,
                        fixedOmega = FALSE,
                        distribution = LogNormalDistribution() )
 
-pVD = ModelParameter( "VD", mu = 2.56E+00,
+pVD = ModelParameter( "VD", mu = THETA6,
                       omega = sqrt( 3.28E-01 ),
                       fixedMu = FALSE,
                       fixedOmega = FALSE,
@@ -106,16 +107,16 @@ pKD = ModelParameter( "KD", mu = THETA7,
                       fixedOmega = TRUE,
                       distribution = LogNormalDistribution() )
 
-pKINT = ModelParameter( "KINT", mu = THETA8,
+pKINT = ModelParameter( "KINT", mu = THETA8 ,
                         omega = sqrt( 0 ),
                         fixedMu = FALSE,
                         fixedOmega = TRUE,
                         distribution = LogNormalDistribution() )
 
-pKSI = ModelParameter( "KSI", mu = 2.11E-01,
+pKSI = ModelParameter( "KSI", mu = THETA9,
                        omega = sqrt( 2.24E-01 ),
-                       fixedMu = TRUE,
-                       fixedOmega = TRUE,
+                       fixedMu = FALSE,
+                       fixedOmega = FALSE,
                        distribution = LogNormalDistribution() )
 
 pKMT = ModelParameter( "KMT", mu = THETA11,
@@ -130,30 +131,29 @@ pKTT = ModelParameter( "KTT", mu = THETA13,
                        fixedOmega = TRUE,
                        distribution = LogNormalDistribution() )
 
-pNB0 = ModelParameter( "NB0", mu = 1.65E+00,
+pNB0 = ModelParameter( "NB0", mu = THETA14,
                        omega = sqrt( 2.98E-01 ),
                        fixedMu = FALSE,
                        fixedOmega = FALSE,
                        distribution = LogNormalDistribution() )
 
-pSC1 = ModelParameter( "SC1", mu = 3.21E+00,
+pSC1 = ModelParameter( "SC1", mu = THETA15,
                        omega = sqrt(  8.03E-01 ),
                        fixedMu = FALSE,
                        fixedOmega = FALSE,
                        distribution = LogNormalDistribution() )
 
-pSM1 = ModelParameter( "SM1", mu = 3.43E+01,
+pSM1 = ModelParameter( "SM1", mu = THETA16,
                        omega = sqrt( 1.28E-02 ),
                        fixedMu = FALSE,
                        fixedOmega = FALSE,
                        distribution = LogNormalDistribution() )
 
-pSM2 = ModelParameter( "SM2", mu = 3.23E+01,
+pSM2 = ModelParameter( "SM2", mu = THETA17,
                        omega = sqrt( 0.0 ),
                        fixedMu = FALSE,
                        fixedOmega = TRUE,
                        distribution = LogNormalDistribution() )
-
 
 # Assign the parameters to the statistical model
 MyStatisticalModel = defineParameter( MyStatisticalModel, pFF )
@@ -202,16 +202,15 @@ MyStatisticalModel = defineVariable( MyStatisticalModel, B7 )
 MyStatisticalModel = defineVariable( MyStatisticalModel, B8 )
 MyStatisticalModel = defineVariable( MyStatisticalModel, B9 )
 MyStatisticalModel = defineVariable( MyStatisticalModel, NB )
-```
 
-```{r ModelEquations, echo = FALSE, asis = TRUE}
 CP0 = quote( dose_RespPK)
+ATOT =  quote( CENT )
 
 NT = quote( B1+B2+B3+B4+B5+B6+B7+B8+B9+NB )
+
 RTOT = quote( KSI*NT )
 RTOT = do.call('substitute', list( RTOT, list( NT = NT ) ) )
 
-ATOT =  quote( CENT )
 BB =  quote( RTOT-ATOT/VD+KD )
 BB = do.call('substitute', list( BB, list( RTOT = RTOT,
                                            ATOT = ATOT) ) )
@@ -232,30 +231,35 @@ ADR = do.call('substitute', list( ADR, list( RTOT = RTOT,
 ## Deriv_B1
 ## ---------------------------------------
 
-# KINB
+# H10 
 H10 = quote( 1.0 + SM1 * CP0 / (SC1 + CP0 ) )
 H10 = do.call( 'substitute', list( H10, list( CP0 = CP0 ) ) )
 
+# KINB
 KINB = quote( KMT * NB0 / H10 )
 KINB = do.call( 'substitute', list( KINB, list( H10 = H10 ) ) )
 
 # H1
 H1 = quote( 1.0 + SM1 * CP / ( SC1 + CP) )
 H1 = do.call('substitute', list( H1, list( CP = CP ) ) )
+
 # H2
 H2 = quote( 1.0 + SM2 * CP / ( SC1 + CP) )
 H2 = do.call('substitute', list( H2, list( CP = CP ) ) )
+
 # H3
 H3 = quote(1.0 + SM3 * CP / ( SC1 + CP) )
 H3 = do.call('substitute', list( H3, list( CP = CP ) ) )
 
-# BM10
+# H20
 H20 = quote( 1.0 + SM2 * CP0 / ( SC1 + CP0 ) )
-H30 = quote( 1.0 + SM3 * CP0 / ( SC1 + CP0 ) )
-
 H20 = do.call( 'substitute', list( H20, list( CP0 = CP0 ) ) )
+
+# H30 
+H30 = quote( 1.0 + SM3 * CP0 / ( SC1 + CP0 ) )
 H30 = do.call( 'substitute', list( H30, list( CP0 = CP0 ) ) )
 
+# BM10
 BM10 = quote( KINB * H10 / ( KBB1 * H30 + KTT * H20 ) )
 
 BM10 = do.call( 'substitute', list( BM10, list( KINB = KINB, 
@@ -273,12 +277,6 @@ Deriv_B1 = do.call('substitute', list(Deriv_B1, list( KINB = KINB,
 ## ---------------------------------------
 ## Deriv_CENT
 ## ---------------------------------------
-
-BM10 = quote(KINB * H10 / (KBB1 * H30 + KTT * H20))
-BM10 = do.call( 'substitute', list( BM10, list( KINB = KINB,
-                                                H10 = H10,
-                                                H20 = H20,
-                                                H30 = H30 ) ) )
 
 BM20 = quote(KTT * H20 * BM10/(KBB1 * H30 + KTT * H20))
 BM20 = do.call( 'substitute', list( BM20, list( BM10 = BM10,
@@ -322,6 +320,7 @@ BM90 = do.call( 'substitute', list( BM90, list( BM80 = BM80,
                                                 H30 = H30 ) ) )
 
 NT0 = quote(BM10+BM20+BM30+BM40+BM50+BM60+BM70+BM80+BM90+NB0)
+
 NT0 = do.call( 'substitute', list( NT0, list(  BM10=BM10,
                                                BM20=BM20,
                                                BM30=BM30,
@@ -365,36 +364,28 @@ Deriv_B7 = quote( KTT * H2 * B6 - KBB1 * H3 * B7 - KTT * H2 * B7 )
 Deriv_B8 = quote( KTT * H2 * B7 - KBB1 * H3 * B8 - KTT * H2 * B8 )
 Deriv_B9 = quote( KTT * H2 * B8 - KBB1 * H3 * B9 - KTT * H2 * B9 )
 
-Deriv_B2 = do.call('substitute', list(Deriv_B2, list( H1 = H1,
-                                                      H2 = H2,
+Deriv_B2 = do.call('substitute', list(Deriv_B2, list( H2 = H2,
                                                       H3 = H3 ) ) )
 
-Deriv_B3 = do.call('substitute', list(Deriv_B3, list( H1 = H1,
-                                                      H2 = H2,
+Deriv_B3 = do.call('substitute', list(Deriv_B3, list( H2 = H2,
                                                       H3 = H3 ) ) )
 
-Deriv_B4 = do.call('substitute', list(Deriv_B4, list( H1 = H1,
-                                                      H2 = H2,
+Deriv_B4 = do.call('substitute', list(Deriv_B4, list( H2 = H2,
                                                       H3 = H3 ) ) )
 
-Deriv_B5 = do.call('substitute', list(Deriv_B5, list( H1 = H1,
-                                                      H2 = H2,
+Deriv_B5 = do.call('substitute', list(Deriv_B5, list( H2 = H2,
                                                       H3 = H3 ) ) )
 
-Deriv_B6 = do.call('substitute', list(Deriv_B6, list( H1 = H1,
-                                                      H2 = H2,
+Deriv_B6 = do.call('substitute', list(Deriv_B6, list( H2 = H2,
                                                       H3 = H3 ) ) )
 
-Deriv_B7 = do.call('substitute', list(Deriv_B7, list( H1 = H1,
-                                                      H2 = H2,
+Deriv_B7 = do.call('substitute', list(Deriv_B7, list( H2 = H2,
                                                       H3 = H3 ) ) )
 
-Deriv_B8 = do.call('substitute', list(Deriv_B8, list( H1 = H1,
-                                                      H2 = H2,
+Deriv_B8 = do.call('substitute', list(Deriv_B8, list( H2 = H2,
                                                       H3 = H3 ) ) )
 
-Deriv_B9 = do.call('substitute', list(Deriv_B9, list( H1 = H1,
-                                                      H2 = H2,
+Deriv_B9 = do.call('substitute', list(Deriv_B9, list( H2 = H2,
                                                       H3 = H3 ) ) )
 
 ## ---------------------------------------
@@ -421,6 +412,22 @@ BBB = do.call('substitute', list(BBB, list( RRTOT = RRTOT ) ) )
 
 ZCP = quote(0.5*(-BBB+sqrt((BBB**2.0) + 4*KD*CENT/VD)))
 ZCP = do.call('substitute', list(ZCP, list( BBB = BBB ) ) )
+
+ZCP = Simplify(ZCP)
+ZNB = Simplify(ZNB)
+
+Deriv_CENT = Simplify(Deriv_CENT)
+Deriv_B1 = Simplify(Deriv_B1)
+Deriv_B2 = Simplify(Deriv_B2)
+Deriv_B3 = Simplify(Deriv_B3)
+Deriv_B4 = Simplify(Deriv_B4)
+Deriv_B5 = Simplify(Deriv_B5)
+Deriv_B6 = Simplify(Deriv_B6)
+Deriv_B7 = Simplify(Deriv_B7)
+Deriv_B8 = Simplify(Deriv_B8)
+Deriv_B9 = Simplify(Deriv_B9)
+Deriv_NB = Simplify(Deriv_NB)
+
 
 MyModelEquations = ModelODEquations(
   
@@ -459,28 +466,23 @@ MyStatisticalModel = addResponse( MyStatisticalModel, Response( "RespPD",
 # Assign the model to the project
 MyProject = defineStatisticalModel( MyProject, MyStatisticalModel )
 
-#define the design
-MyDesign = Design("MyDesignclozapine")
 
 # -------------------------------------------------
 # initial conditions
 # -------------------------------------------------
 
 # initial values
-KA_init = THETA2 * exp( sqrt( 0.0 ) )
-KEL_init = THETA5* exp( sqrt( 3.12E-01 ) )
-VD_init = THETA6 * exp( sqrt( 3.28E-01 ) )
-KSI_init = THETA9 * exp( sqrt( 2.24E-01 ) )
-NB0_init = THETA14 * exp( sqrt( 2.98E-01 ) )
-SC1_init = THETA15 * exp( sqrt( 8.03E-01 ) )
-SM1_init = THETA16 * exp( sqrt( 1.28E-02 ) )
-SM2_init = THETA17 * exp( sqrt( 0 ) )
+VD_init = THETA6 
+KD_init = THETA7
+KSI_init = THETA9  
+NB0_init = THETA14 
+SC1_init = THETA15 
+SM1_init = THETA16 
+SM2_init = THETA17 
 SM3_init = THETA18  
-#CP0_init = dose_RespPK
 KMT_init = THETA11
 KBB1_init = THETA12
 KTT_init = THETA13
-KD_init = THETA7
 
 # expressions with dose RespPK
 H10_init = quote( 1.0 + SM1_init * dose_RespPK / (SC1_init + dose_RespPK ) )
@@ -576,6 +578,17 @@ ADR0_init = do.call('substitute', list(ADR0_init, list( RTOT0_init = RTOT0_init,
 CENT_init = quote(AC0_init + ADR0_init)
 CENT_init = do.call('substitute', list(CENT_init, list( AC0_init = AC0_init,
                                                         ADR0_init = ADR0_init) ) )
+CENT_init = Simplify(CENT_init)
+BM10_init = Simplify(BM10_init)
+BM20_init = Simplify(BM20_init)
+BM30_init = Simplify(BM30_init)
+BM40_init = Simplify(BM40_init)
+BM50_init = Simplify(BM50_init)
+BM60_init = Simplify(BM60_init)
+BM70_init = Simplify(BM70_init)
+BM80_init = Simplify(BM80_init)
+BM90_init = Simplify(BM90_init)
+NB0_init = Simplify(NB0_init)
 
 cond_init_arms = list( "ABS"  = 0, 
                        "CENT" = as.expression(CENT_init), 
@@ -591,7 +604,11 @@ cond_init_arms = list( "ABS"  = 0,
                        "B8"   = as.expression(BM80_init),
                        "B9"   = as.expression(BM90_init),
                        "NB"   = NB0_init  )
+```
 
+
+
+```{r, echo = FALSE, asis = TRUE}
 arm1 = Arm( name = "arm1", arm_size = 10, cond_init = cond_init_arms )
 arm2 = Arm( name = "arm2", arm_size = 10, cond_init = cond_init_arms )
 arm3 = Arm( name = "arm3", arm_size = 10, cond_init = cond_init_arms )
@@ -644,13 +661,14 @@ arm6 = addSampling( arm6, SamplingTimes( outcome = "RespPK",
 arm6 = addSampling( arm6, SamplingTimes( outcome = "RespPD", 
                                          sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                                          initialTime = 0 ) )
 # Add administration
-arm1 = addAdministration( arm1, Administration( outcome = "RespPK", tau = 24, amount_dose = WT * c(0.1) ) )
-arm2 = addAdministration( arm2, Administration( outcome = "RespPK", tau = 24, amount_dose = WT * c(0.3) ) )
-arm3 = addAdministration( arm3, Administration( outcome = "RespPK", tau = 24, amount_dose = WT * c(1) ) )
-arm4 = addAdministration( arm4, Administration( outcome = "RespPK", tau = 24, amount_dose = WT * c(3) ) )
-arm5 = addAdministration( arm5, Administration( outcome = "RespPK", tau = 24, amount_dose = WT * c(10) ) )
-arm6 = addAdministration( arm6, Administration( outcome = "RespPK", tau = 24, amount_dose = WT * c(30) ) )
+arm1 = addAdministration( arm1, Administration( outcome = "RespPK", tau = 24, amount_dose = c(0.1) ) )
+arm2 = addAdministration( arm2, Administration( outcome = "RespPK", tau = 24, amount_dose = c(0.3) ) )
+arm3 = addAdministration( arm3, Administration( outcome = "RespPK", tau = 24, amount_dose = c(1) ) )
+arm4 = addAdministration( arm4, Administration( outcome = "RespPK", tau = 24, amount_dose = c(3) ) )
+arm5 = addAdministration( arm5, Administration( outcome = "RespPK", tau = 24, amount_dose = c(10) ) )
+arm6 = addAdministration( arm6, Administration( outcome = "RespPK", tau = 24, amount_dose = c(30) ) )
 
+MyDesign = Design("MyDesignclozapine")
 MyDesign = addArm( MyDesign, arm1 )
 #MyDesign = addArm( MyDesign, arm2 )
 #MyDesign = addArm( MyDesign, arm3 )
@@ -664,6 +682,22 @@ MyProject = addDesign( MyProject, MyDesign )
 evaluationPop = EvaluatePopulationFIM( MyProject )
 ```
 
+```{r, echo = FALSE, asis = TRUE}
 
+fim = evaluationPop@designs$MyDesignclozapine@fimOfDesign@mfisher
+
+res = evaluationPop@designs$MyDesignclozapine@concentration$arm1
+
+p = ggplot( res, aes( x = time, y = RespPK  ) ) +
+  geom_point() +
+  geom_line() 
+print( p )
+
+p = ggplot( res, aes( x = time, y = RespPD  ) ) +
+  geom_point() +
+  geom_line() 
+print( p )
+
+```
 
 
