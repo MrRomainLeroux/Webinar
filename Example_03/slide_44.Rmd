@@ -32,6 +32,10 @@ MyProject = PFIMProject( name = "filgrastim" )
 ```{r StatisticalModel, echo = FALSE, asis = TRUE}
 # Create the statistical model
 MyStatisticalModel = StatisticalModel()
+
+MyStatisticalModel = setParametersOdeSolver( MyStatisticalModel, list( atol=1e-8,
+                                                                       rtol=1e-8,
+                                                                       .relStep=1e-8 ) )
 ```
 
 ```{r constantParameters, echo = FALSE, asis = TRUE}
@@ -596,42 +600,42 @@ arm1 = addSampling( arm1, SamplingTimes( outcome = "RespPK",
                                          initialTime = 0 ) )
 
 arm1 = addSampling( arm1, SamplingTimes( outcome = "RespPD", 
-                                         sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                                  initialTime = 0 ) )
+                                         sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                                          initialTime = 0 ) )
 
 arm2 = addSampling( arm2, SamplingTimes( outcome = "RespPK", 
                                          sample_time = c( pk_dense, pk_dense + 6*24, 7*24 + c(4, 24, 48) ), 
                                          initialTime = 0 ) )
 
 arm2 = addSampling( arm2, SamplingTimes( outcome = "RespPD", 
-                                         sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                   initialTime = 0 ) )
+                                         sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                                          initialTime = 0 ) )
 
 arm3 = addSampling( arm3, SamplingTimes( outcome = "RespPK", 
                                          sample_time = c( pk_dense, pk_dense + 6*24, 7*24 + c(4, 24, 48) ), 
                                          initialTime = 0 ) )
 
 arm3 = addSampling( arm3, SamplingTimes( outcome = "RespPD", 
-                                         sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                   initialTime = 0 ) )
+                                         sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                                          initialTime = 0 ) )
 
 arm4 = addSampling( arm4, SamplingTimes( outcome = "RespPK", 
                                          sample_time = c( pk_dense, pk_dense + 6*24, 7*24 + c(4, 24, 48) ), 
                                          initialTime = 0 ) )
 
 arm4 = addSampling( arm4, SamplingTimes( outcome = "RespPD", 
-                                         sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                   initialTime = 0 ) )
+                                         sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                                          initialTime = 0 ) )
 
 arm5 = addSampling( arm5, SamplingTimes( outcome = "RespPK", 
                                          sample_time = c( pk_dense, pk_dense + 6*24, 7*24 + c(4, 24, 48) ), 
                                          initialTime = 0 ) )
 
 arm5 = addSampling( arm5, SamplingTimes( outcome = "RespPD", 
-                                         sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                   initialTime = 0 ) )
+                                         sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                                          initialTime = 0 ) )
 
 arm6 = addSampling( arm6, SamplingTimes( outcome = "RespPK", 
                                          sample_time = c( pk_dense, pk_dense + 6*24, 7*24 + c(4, 24, 48) ), 
                                          initialTime = 0 ) )
 
 arm6 = addSampling( arm6, SamplingTimes( outcome = "RespPD", 
-                                         sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                    initialTime = 0 ) )
+                                         sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                                          initialTime = 0 ) )
 # Add administration
 arm1 = addAdministration( arm1, Administration( outcome = "RespPK", tau = 24, amount_dose = WT * c(0.1) ) )
 arm2 = addAdministration( arm2, Administration( outcome = "RespPK", tau = 24, amount_dose = WT * c(0.3) ) )
@@ -641,11 +645,11 @@ arm5 = addAdministration( arm5, Administration( outcome = "RespPK", tau = 24, am
 arm6 = addAdministration( arm6, Administration( outcome = "RespPK", tau = 24, amount_dose = WT * c(30) ) )
 
 MyDesign = addArm( MyDesign, arm1 )
-MyDesign = addArm( MyDesign, arm2 )
-MyDesign = addArm( MyDesign, arm3 )
-MyDesign = addArm( MyDesign, arm4 )
-MyDesign = addArm( MyDesign, arm5 )
-MyDesign = addArm( MyDesign, arm6 )
+#MyDesign = addArm( MyDesign, arm2 )
+#MyDesign = addArm( MyDesign, arm3 )
+#MyDesign = addArm( MyDesign, arm4 )
+#MyDesign = addArm( MyDesign, arm5 )
+#MyDesign = addArm( MyDesign, arm6 )
 
 #update the project with the design
 MyProject = addDesign( MyProject, MyDesign )
