@@ -76,6 +76,12 @@ SM3   = THETA18
 #KTT   = THETA13
 #CP0   = BAS
 
+pFF = ModelParameter( "FF", mu =THETA1,
+                      omega = sqrt( 0.00E+00 ),
+                      fixedMu = FALSE,
+                      fixedOmega = TRUE,
+                      distribution = LogNormalDistribution() )
+
 pKA = ModelParameter( "KA", mu = 6.42E-01,
                       omega = sqrt( 0.00E+00 ),
                       fixedMu = FALSE,
@@ -108,8 +114,8 @@ pKINT = ModelParameter( "KINT", mu = THETA8,
 
 pKSI = ModelParameter( "KSI", mu = 2.11E-01,
                        omega = sqrt( 2.24E-01 ),
-                       fixedMu = FALSE,
-                       fixedOmega = FALSE,
+                       fixedMu = TRUE,
+                       fixedOmega = TRUE,
                        distribution = LogNormalDistribution() )
 
 pKMT = ModelParameter( "KMT", mu = THETA11,
@@ -148,7 +154,9 @@ pSM2 = ModelParameter( "SM2", mu = 3.23E+01,
                        fixedOmega = TRUE,
                        distribution = LogNormalDistribution() )
 
+
 # Assign the parameters to the statistical model
+MyStatisticalModel = defineParameter( MyStatisticalModel, pFF )
 MyStatisticalModel = defineParameter( MyStatisticalModel, pKA )
 MyStatisticalModel = defineParameter( MyStatisticalModel, pKEL )
 MyStatisticalModel = defineParameter( MyStatisticalModel, pVD )
@@ -543,8 +551,7 @@ BM90_init = quote( KTT_init * H20_init * BM80_init/(KBB1_init * H30_init + KTT_i
 BM90_init = do.call('substitute', list(BM90_init, list( BM80_init = BM80_init,
                                                         H20_init = H20_init,
                                                         H30_init = H30_init  ) ) )
-ABS  = 0
-
+ 
 # CENT
 AC0_init = quote( dose_RespPK * VD_init)
 NT0_init  = quote( BM10_init + BM20_init + BM30_init + BM40_init + BM50_init + BM60_init + BM70_init + BM80_init + BM90_init + NB0_init )
