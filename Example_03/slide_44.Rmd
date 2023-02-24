@@ -32,18 +32,14 @@ MyProject = PFIMProject( name = "filgrastim" )
 ```{r StatisticalModel, echo = FALSE, asis = TRUE}
 # Create the statistical model
 MyStatisticalModel = StatisticalModel()
-
-MyStatisticalModel = setParametersOdeSolver( MyStatisticalModel, list( atol=1e-4,
-                                                                       rtol=1e-4,
-                                                                       .relStep=1e-4 ) )
-
+MyStatisticalModel = setParametersOdeSolver( MyStatisticalModel, list( atol=1e-6,
+                                                                       rtol=1e-6,
+                                                                       .relStep=1e-10 ) )
 ```
 
 ```{r constantParameters, echo = FALSE, asis = TRUE}
-
 # weight
 WT = 75
-
 ## [THETA]
 THETA1 = 6.26E-01  #1
 THETA2 = 6.42E-01  #2
@@ -65,113 +61,160 @@ THETA17 = 3.23E+01  #17
 THETA18 = 0.00E+00  #18
 
 ##  [MAIN]
-#FF    = THETA1
-FR    = THETA3
-D2    = THETA4
-KOFF  = THETA10
-KBB1  = THETA12
-SM3   = THETA18
-#KD    = THETA7
-#KINT  = THETA8
-#KMT   = THETA11
-#KTT   = THETA13
-#CP0   = BAS
 
-pFF = ModelParameter( "FF", mu = THETA1,
+# CP0
+CP0 = quote( dose_RespPK )
+
+
+pFF = ModelParameter( "FF", 
+                       mu = THETA1,
+                       omega = sqrt( 0.0 ),
+                       fixedMu = TRUE,
+                       fixedOmega = TRUE,
+                       distribution = LogNormalDistribution() )
+
+pKA = ModelParameter( "KA", 
+                      mu = THETA2,
                       omega = sqrt( 0.00E+00 ),
                       fixedMu = FALSE,
                       fixedOmega = TRUE,
                       distribution = LogNormalDistribution() )
 
-pKA = ModelParameter( "KA", mu = THETA2,
-                      omega = sqrt( 0.00E+00 ),
-                      fixedMu = FALSE,
-                      fixedOmega = TRUE,
-                      distribution = LogNormalDistribution() )
+pFR = ModelParameter( "FR", 
+                       mu = THETA3,
+                       omega = sqrt( 0.0 ),
+                       fixedMu = TRUE,
+                       fixedOmega = TRUE,
+                       distribution = LogNormalDistribution() )
 
-pKEL = ModelParameter( "KEL", mu = THETA5,
-                       omega = sqrt( 3.12E-01),
+pD2 = ModelParameter( "D2", 
+                       mu = THETA4,
+                       omega = sqrt( 0.0 ),
+                       fixedMu = TRUE,
+                       fixedOmega = TRUE,
+                       distribution = LogNormalDistribution() )
+
+pKEL = ModelParameter( "KEL", 
+                       mu = THETA5,
+                       omega = sqrt( 3.12E-01 ),
                        fixedMu = FALSE,
                        fixedOmega = FALSE,
                        distribution = LogNormalDistribution() )
 
-pVD = ModelParameter( "VD", mu = THETA6,
+pVD = ModelParameter( "VD", 
+                      mu = THETA6,
                       omega = sqrt( 3.28E-01 ),
                       fixedMu = FALSE,
                       fixedOmega = FALSE,
                       distribution = LogNormalDistribution() )
 
-pKD = ModelParameter( "KD", mu = THETA7,
+pKD = ModelParameter( "KD",
+                      mu = THETA7,
                       omega = sqrt( 0 ),
                       fixedMu = FALSE,
                       fixedOmega = TRUE,
                       distribution = LogNormalDistribution() )
 
-pKINT = ModelParameter( "KINT", mu = THETA8 ,
+pKINT = ModelParameter( "KINT", 
+                        mu = THETA8 ,
                         omega = sqrt( 0 ),
                         fixedMu = FALSE,
                         fixedOmega = TRUE,
                         distribution = LogNormalDistribution() )
 
-pKSI = ModelParameter( "KSI", mu = THETA9,
+pKSI = ModelParameter( "KSI", 
+                       mu = THETA9,
                        omega = sqrt( 2.24E-01 ),
                        fixedMu = FALSE,
                        fixedOmega = FALSE,
                        distribution = LogNormalDistribution() )
 
-pKMT = ModelParameter( "KMT", mu = THETA11,
+pKOFF = ModelParameter( "KOFF", 
+                       mu = THETA10,
+                       omega = sqrt( 0.0 ),
+                       fixedMu = TRUE,
+                       fixedOmega = TRUE,
+                       distribution = LogNormalDistribution() )
+
+pKMT = ModelParameter( "KMT", 
+                       mu = THETA11,
                        omega = sqrt( 0 ),
                        fixedMu = FALSE,
                        fixedOmega = TRUE,
                        distribution = LogNormalDistribution() )
 
-pKTT = ModelParameter( "KTT", mu = THETA13,
+pKBB1 = ModelParameter( "KBB1", 
+                       mu = THETA12,
+                       omega = sqrt( 0.0 ),
+                       fixedMu = TRUE,
+                       fixedOmega = TRUE,
+                       distribution = LogNormalDistribution() )
+
+pKTT = ModelParameter( "KTT", 
+                       mu = THETA13,
                        omega = sqrt( 0 ),
                        fixedMu = FALSE,
                        fixedOmega = TRUE,
                        distribution = LogNormalDistribution() )
 
-pNB0 = ModelParameter( "NB0", mu = THETA14,
+pNB0 = ModelParameter( "NB0", 
+                       mu = THETA14,
                        omega = sqrt( 2.98E-01 ),
                        fixedMu = FALSE,
                        fixedOmega = FALSE,
                        distribution = LogNormalDistribution() )
 
-pSC1 = ModelParameter( "SC1", mu = THETA15,
+pSC1 = ModelParameter( "SC1", 
+                       mu = THETA15,
                        omega = sqrt(  8.03E-01 ),
                        fixedMu = FALSE,
                        fixedOmega = FALSE,
                        distribution = LogNormalDistribution() )
 
-pSM1 = ModelParameter( "SM1", mu = THETA16,
+pSM1 = ModelParameter( "SM1", 
+                       mu = THETA16,
                        omega = sqrt( 1.28E-02 ),
                        fixedMu = FALSE,
                        fixedOmega = FALSE,
                        distribution = LogNormalDistribution() )
 
-pSM2 = ModelParameter( "SM2", mu = THETA17,
+pSM2 = ModelParameter( "SM2", 
+                       mu = THETA17,
                        omega = sqrt( 0.0 ),
                        fixedMu = FALSE,
+                       fixedOmega = TRUE,
+                       distribution = LogNormalDistribution() )
+
+pSM3 = ModelParameter( "SM3", 
+                       mu = THETA18,
+                       omega = sqrt( 0.0 ),
+                       fixedMu = TRUE,
                        fixedOmega = TRUE,
                        distribution = LogNormalDistribution() )
 
 # Assign the parameters to the statistical model
 MyStatisticalModel = defineParameter( MyStatisticalModel, pFF )
 MyStatisticalModel = defineParameter( MyStatisticalModel, pKA )
+MyStatisticalModel = defineParameter( MyStatisticalModel, pFR )
+MyStatisticalModel = defineParameter( MyStatisticalModel, pD2 )
 MyStatisticalModel = defineParameter( MyStatisticalModel, pKEL )
 MyStatisticalModel = defineParameter( MyStatisticalModel, pVD )
 MyStatisticalModel = defineParameter( MyStatisticalModel, pKD )
 MyStatisticalModel = defineParameter( MyStatisticalModel, pKINT )
 MyStatisticalModel = defineParameter( MyStatisticalModel, pKSI )
+MyStatisticalModel = defineParameter( MyStatisticalModel, pKOFF )
 MyStatisticalModel = defineParameter( MyStatisticalModel, pKMT )
+MyStatisticalModel = defineParameter( MyStatisticalModel, pKBB1  )
 MyStatisticalModel = defineParameter( MyStatisticalModel, pKTT )
 MyStatisticalModel = defineParameter( MyStatisticalModel, pNB0 )
 MyStatisticalModel = defineParameter( MyStatisticalModel, pSC1 )
 MyStatisticalModel = defineParameter( MyStatisticalModel, pSM1 )
 MyStatisticalModel = defineParameter( MyStatisticalModel, pSM2 )
+MyStatisticalModel = defineParameter( MyStatisticalModel, pSM3 )
 ```
 
 ```{r ModelVariable, echo = FALSE, asis = TRUE}
+
 # Define the variables of the ode model
 ABS = ModelVariable( "ABS" )
 CENT = ModelVariable( "CENT" )
@@ -202,54 +245,13 @@ MyStatisticalModel = defineVariable( MyStatisticalModel, B7 )
 MyStatisticalModel = defineVariable( MyStatisticalModel, B8 )
 MyStatisticalModel = defineVariable( MyStatisticalModel, B9 )
 MyStatisticalModel = defineVariable( MyStatisticalModel, NB )
+```
 
-CP0 = quote( dose_RespPK)
-ATOT =  quote( CENT )
-
-NT = quote( B1+B2+B3+B4+B5+B6+B7+B8+B9+NB )
-
-RTOT = quote( KSI*NT )
-RTOT = do.call('substitute', list( RTOT, list( NT = NT ) ) )
-
-BB =  quote( RTOT-ATOT/VD+KD )
-BB = do.call('substitute', list( BB, list( RTOT = RTOT,
-                                           ATOT = ATOT) ) )
-
-CP = quote( 0.5*(-BB+sqrt(BB**2.0)+4*KD*ATOT/VD)) 
-CP = do.call('substitute', list( CP, list( BB = BB,
-                                           ATOT = ATOT ) ) )
-
-AC = quote( CP*VD )
-AC = do.call('substitute', list( AC, list( CP = CP ) ) )
-
-ADR = quote( RTOT*AC/( KD+CP ) )
-ADR = do.call('substitute', list( ADR, list( RTOT = RTOT,
-                                             AC = AC,
-                                             CP = CP ) ) )
-
-## ---------------------------------------
-## Deriv_B1
-## ---------------------------------------
+```{r, echo = FALSE, asis = T}
 
 # H10 
 H10 = quote( 1.0 + SM1 * CP0 / (SC1 + CP0 ) )
 H10 = do.call( 'substitute', list( H10, list( CP0 = CP0 ) ) )
-
-# KINB
-KINB = quote( KMT * NB0 / H10 )
-KINB = do.call( 'substitute', list( KINB, list( H10 = H10 ) ) )
-
-# H1
-H1 = quote( 1.0 + SM1 * CP / ( SC1 + CP) )
-H1 = do.call('substitute', list( H1, list( CP = CP ) ) )
-
-# H2
-H2 = quote( 1.0 + SM2 * CP / ( SC1 + CP) )
-H2 = do.call('substitute', list( H2, list( CP = CP ) ) )
-
-# H3
-H3 = quote(1.0 + SM3 * CP / ( SC1 + CP) )
-H3 = do.call('substitute', list( H3, list( CP = CP ) ) )
 
 # H20
 H20 = quote( 1.0 + SM2 * CP0 / ( SC1 + CP0 ) )
@@ -259,24 +261,16 @@ H20 = do.call( 'substitute', list( H20, list( CP0 = CP0 ) ) )
 H30 = quote( 1.0 + SM3 * CP0 / ( SC1 + CP0 ) )
 H30 = do.call( 'substitute', list( H30, list( CP0 = CP0 ) ) )
 
-# BM10
-BM10 = quote( KINB * H10 / ( KBB1 * H30 + KTT * H20 ) )
+# KINB
+KINB = quote( KMT * NB0 / H10 )
+KINB = do.call( 'substitute', list( KINB, list( H10 = H10 ) ) )
 
+# BM10,BM20,BM30,BM40,BM50,BM60,BM70,BM80,BM90
+BM10 = quote( KINB * H10 / ( KBB1 * H30 + KTT * H20 ) )
 BM10 = do.call( 'substitute', list( BM10, list( KINB = KINB, 
                                                 H10 = H10, 
-                                                H20 = H10,
-                                                H30 = H10 ) ) )
-
-Deriv_B1 = quote( KINB* H1*(B1/BM10) - KBB1 * H3 * B1 - KTT * H2 * B1 )
-
-Deriv_B1 = do.call('substitute', list(Deriv_B1, list( KINB = KINB,
-                                                      H1 = H1,
-                                                      H2 = H2,
-                                                      H3 = H3,
-                                                      BM10 = BM10 ) ) )
-## ---------------------------------------
-## Deriv_CENT
-## ---------------------------------------
+                                                H20 = H20,
+                                                H30 = H30 ) ) )
 
 BM20 = quote(KTT * H20 * BM10/(KBB1 * H30 + KTT * H20))
 BM20 = do.call( 'substitute', list( BM20, list( BM10 = BM10,
@@ -287,7 +281,6 @@ BM30 = quote(KTT * H20 * BM20/(KBB1 * H30 + KTT * H20))
 BM30 = do.call( 'substitute', list( BM30, list( BM20 = BM20,
                                                 H20 = H20,
                                                 H30 = H30 ) ) )
-
 
 BM40 = quote(KTT * H20 * BM30/(KBB1 * H30 + KTT * H20))
 BM40 = do.call( 'substitute', list( BM40, list( BM30 = BM30,
@@ -318,43 +311,96 @@ BM90 = quote(KTT * H20 * BM80/(KBB1 * H30 + KTT * H20))
 BM90 = do.call( 'substitute', list( BM90, list( BM80 = BM80,
                                                 H20 = H20,
                                                 H30 = H30 ) ) )
-
+# NT0
 NT0 = quote(BM10+BM20+BM30+BM40+BM50+BM60+BM70+BM80+BM90+NB0)
 
-NT0 = do.call( 'substitute', list( NT0, list(  BM10=BM10,
-                                               BM20=BM20,
-                                               BM30=BM30,
-                                               BM40=BM40,
-                                               BM50=BM50,
-                                               BM60=BM60,
-                                               BM70=BM70,
-                                               BM80=BM80,
-                                               BM90=BM90 ) ) )
-
-RTOT0 = quote(KSI*NT0)
-RTOT0 = do.call( 'substitute', list( RTOT0, list( NT0 = NT0 ) ) )
-
-AC0   = quote(CP0 * VD)
+NT0 = do.call( 'substitute', list( NT0, list(  BM10 = BM10,
+                                               BM20 = BM20,
+                                               BM30 = BM30,
+                                               BM40 = BM40,
+                                               BM50 = BM50,
+                                               BM60 = BM60,
+                                               BM70 = BM70,
+                                               BM80 = BM80,
+                                               BM90 = BM90 ) ) )
+# AC0
+AC0  = quote( CP0 * VD )
 AC0 = do.call( 'substitute', list( AC0, list( CP0 = CP0 ) ) )
 
-ADR0  = quote(RTOT0*AC0/(KD+CP0))
+# RTOT0
+RTOT0 = quote( KSI*NT0 )
+RTOT0 = do.call( 'substitute', list( RTOT0, list( NT0 = NT0 ) ) )
+
+# ADR0
+ADR0  = quote( RTOT0*AC0/(KD+CP0) )
 ADR0 = do.call( 'substitute', list( ADR0, list( RTOT0 = RTOT0,
                                                 AC0 = AC0,
                                                 CP0 = CP0 ) ) )
-
+# KIN 
 KIN  = quote(KEL * AC0 + KINT * ADR0)
 KIN = do.call( 'substitute', list( KIN, list( AC0 = AC0,
                                               ADR0 = ADR0 ) ) )
 
+# ATOT 
+ATOT =  quote( CENT )
+
+# ADR
+ADR = quote( RTOT*AC/( KD+CP ) )
+ADR = do.call('substitute', list( ADR, list( RTOT = RTOT,
+                                             AC = AC,
+                                             CP = CP ) ) )
+# NT
+NT = quote( B1+B2+B3+B4+B5+B6+B7+B8+B9+NB )
+
+# RTOT
+RTOT = quote( KSI*NT )
+RTOT = do.call('substitute', list( RTOT, list( NT = NT ) ) )
+
+# BB
+BB =  quote( RTOT-ATOT/VD+KD )
+BB = do.call('substitute', list( BB, list( RTOT = RTOT,
+                                           ATOT = ATOT) ) )
+# CP
+CP = quote( 0.5*(-BB+sqrt(BB**2.0)+4*KD*ATOT/VD)) 
+CP = do.call('substitute', list( CP, list( BB = BB,
+                                           ATOT = ATOT ) ) )
+# AC
+AC = quote( CP*VD )
+AC = do.call('substitute', list( AC, list( CP = CP ) ) )
+
+# H1
+H1 = quote( 1.0 + SM1 * CP / ( SC1 + CP) )
+H1 = do.call('substitute', list( H1, list( CP = CP ) ) )
+
+# H2
+H2 = quote( 1.0 + SM2 * CP / ( SC1 + CP) )
+H2 = do.call('substitute', list( H2, list( CP = CP ) ) )
+
+# H3
+H3 = quote(1.0 + SM3 * CP / ( SC1 + CP) )
+H3 = do.call('substitute', list( H3, list( CP = CP ) ) )
+
+## ---------------------------------------
+## ODEs
+## ---------------------------------------
+
+# Deriv_B1
+Deriv_B1 = quote( KINB* H1*(B1/BM10) - KBB1 * H3 * B1 - KTT * H2 * B1 )
+
+Deriv_B1 = do.call('substitute', list(Deriv_B1, list( KINB = KINB,
+                                                      H1 = H1,
+                                                      H2 = H2,
+                                                      H3 = H3,
+                                                      BM10 = BM10 ) ) )
+
+# Deriv_CENT
 Deriv_CENT = quote( KA * ABS  + KIN - KEL * AC - KINT * ADR )
+
 Deriv_CENT = do.call('substitute', list( Deriv_CENT, list( AC = AC,
                                                            KIN = KIN,
                                                            ADR = ADR ) ) )
 
-## ---------------------------------------
-## Deriv_B2 ... Deriv_B9
-## ---------------------------------------
-
+# Deriv_B2 ... Deriv_B9
 Deriv_B2 = quote( KTT * H2 * B1 - KBB1 * H3 * B2 - KTT * H2 * B2 )
 Deriv_B3 = quote( KTT * H2 * B2 - KBB1 * H3 * B3 - KTT * H2 * B3 )
 Deriv_B4 = quote( KTT * H2 * B3 - KBB1 * H3 * B4 - KTT * H2 * B4 )
@@ -388,18 +434,15 @@ Deriv_B8 = do.call('substitute', list(Deriv_B8, list( H2 = H2,
 Deriv_B9 = do.call('substitute', list(Deriv_B9, list( H2 = H2,
                                                       H3 = H3 ) ) )
 
-## ---------------------------------------
-## Deriv_NB
-## ---------------------------------------
+# Deriv_NB
 
 Deriv_NB = quote( KTT * H2 * B9 + KBB1 * H3 *(B1+B2+B3+B4+B5+B6+B7+B8+B9)-KMT*NB ) 
 
 Deriv_NB = do.call('substitute', list(Deriv_NB , list( H2 = H2,
                                                        H3 = H3 ) ) )
-
-## ---------------------------------------
-## outputs: CP, RESP
-## ---------------------------------------
+# ---------------------------------------
+# outputs: CP, RESP
+# ---------------------------------------
 
 ZNB = quote(NB)
 ZNT = quote(B1+B2+B3+B4+B5+B6+B7+B8+B9+NB)
@@ -427,7 +470,6 @@ Deriv_B7 = Simplify(Deriv_B7)
 Deriv_B8 = Simplify(Deriv_B8)
 Deriv_B9 = Simplify(Deriv_B9)
 Deriv_NB = Simplify(Deriv_NB)
-
 
 MyModelEquations = ModelODEquations(
   
@@ -458,19 +500,15 @@ MyStatisticalModel = addResponse( MyStatisticalModel, Response( "RespPK",
                                                                 Combined1( sigma_inter = 0.0, sigma_slope = 2.53E-01 ) ) )
 
 MyStatisticalModel = addResponse( MyStatisticalModel, Response( "RespPD", 
-                                                                Combined1( sigma_inter = 2.10E+00, sigma_slope = 2.27E-02 ) ) )
+                                                                Combined1( sigma_inter = 2.27E-02, sigma_slope = 2.10E+00 ) ) )
 ```
 
 ```{r, echo = FALSE, asis = TRUE}
-
 # Assign the model to the project
 MyProject = defineStatisticalModel( MyProject, MyStatisticalModel )
-
-
 # -------------------------------------------------
 # initial conditions
 # -------------------------------------------------
-
 # initial values
 VD_init = THETA6 
 KD_init = THETA7
@@ -494,70 +532,55 @@ KINB_init = do.call('substitute', list(KINB_init, list( H10_init = H10_init ) ) 
 
 # BM10_init
 BM10_init = quote( KINB_init * H10_init / (KBB1_init * H30_init + KTT_init * H20_init ) )
-
 BM10_init = do.call('substitute', list(BM10_init, list( KINB_init = KINB_init,
                                                         H10_init = H10_init,
                                                         H20_init = H20_init,
                                                         H30_init = H30_init  ) ) )
 # BM20_init
 BM20_init = quote( KTT_init * H20_init * BM10_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
-
 BM20_init = do.call('substitute', list(BM20_init, list( BM10_init = BM10_init,
                                                         H20_init = H20_init,
                                                         H30_init = H30_init  ) ) )
-
 # BM30_init
 BM30_init = quote( KTT_init * H20_init * BM20_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
-
 BM30_init = do.call('substitute', list(BM30_init, list( BM20_init = BM20_init,
                                                         H20_init = H20_init,
                                                         H30_init = H30_init  ) ) )
-
 # BM40_init
 BM40_init = quote( KTT_init * H20_init * BM30_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
-
 BM40_init = do.call('substitute', list(BM40_init, list( BM30_init = BM30_init,
                                                         H20_init = H20_init,
                                                         H30_init = H30_init  ) ) )
 # BM50_init
 BM50_init = quote( KTT_init * H20_init * BM40_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
-
 BM50_init = do.call('substitute', list(BM50_init, list( BM40_init = BM40_init,
                                                         H20_init = H20_init,
                                                         H30_init = H30_init  ) ) )
-
 # BM60_init
 BM60_init = quote( KTT_init * H20_init * BM50_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
-
 BM60_init = do.call('substitute', list(BM60_init, list( BM50_init = BM50_init,
                                                         H20_init = H20_init,
                                                         H30_init = H30_init  ) ) )
-
 # BM70_init
 BM70_init = quote( KTT_init * H20_init * BM60_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
-
 BM70_init = do.call('substitute', list(BM70_init, list( BM60_init = BM60_init,
                                                         H20_init = H20_init,
                                                         H30_init = H30_init  ) ) )
-
 # BM80_init
 BM80_init = quote( KTT_init * H20_init * BM70_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
-
 BM80_init = do.call('substitute', list(BM80_init, list( BM70_init = BM70_init,
                                                         H20_init = H20_init,
                                                         H30_init = H30_init  ) ) )
-
 # BM90_init
 BM90_init = quote( KTT_init * H20_init * BM80_init/(KBB1_init * H30_init + KTT_init * H20_init ) )
-
 BM90_init = do.call('substitute', list(BM90_init, list( BM80_init = BM80_init,
                                                         H20_init = H20_init,
                                                         H30_init = H30_init  ) ) )
- 
+
 # CENT
 AC0_init = quote( dose_RespPK * VD_init)
-NT0_init  = quote( BM10_init + BM20_init + BM30_init + BM40_init + BM50_init + BM60_init + BM70_init + BM80_init + BM90_init + NB0_init )
 
+NT0_init  = quote( BM10_init + BM20_init + BM30_init + BM40_init + BM50_init + BM60_init + BM70_init + BM80_init + BM90_init + NB0_init )
 NT0_init = do.call('substitute', list(NT0_init, list( BM10_init = BM10_init,
                                                       BM20_init = BM20_init,
                                                       BM30_init = BM30_init,
@@ -567,18 +590,18 @@ NT0_init = do.call('substitute', list(NT0_init, list( BM10_init = BM10_init,
                                                       BM70_init = BM70_init,
                                                       BM80_init = BM80_init,
                                                       BM90_init = BM90_init) ) )
-
 RTOT0_init = quote(KSI_init*NT0_init)
 RTOT0_init = do.call('substitute', list(RTOT0_init, list( NT0_init = NT0_init ) ) )
 
 ADR0_init  = quote(RTOT0_init*AC0_init/(KD_init + dose_RespPK))
 ADR0_init = do.call('substitute', list(ADR0_init, list( RTOT0_init = RTOT0_init,
                                                         AC0_init = AC0_init) ) )
-
 CENT_init = quote(AC0_init + ADR0_init)
 CENT_init = do.call('substitute', list(CENT_init, list( AC0_init = AC0_init,
                                                         ADR0_init = ADR0_init) ) )
+
 CENT_init = Simplify(CENT_init)
+
 BM10_init = Simplify(BM10_init)
 BM20_init = Simplify(BM20_init)
 BM30_init = Simplify(BM30_init)
@@ -588,12 +611,13 @@ BM60_init = Simplify(BM60_init)
 BM70_init = Simplify(BM70_init)
 BM80_init = Simplify(BM80_init)
 BM90_init = Simplify(BM90_init)
+
 NB0_init = Simplify(NB0_init)
 
-cond_init_arms = list( "ABS"  = 0, 
+cond_init_arms = list( "ABS"  = 0.0, 
                        "CENT" = as.expression(CENT_init), 
-                       "FRR"  = 0,
-                       "DR"   = 0,
+                       "FRR"  = 0.0,
+                       "DR"   = 0.0,
                        "B1"   = as.expression(BM10_init),
                        "B2"   = as.expression(BM20_init),
                        "B3"   = as.expression(BM30_init),
@@ -604,6 +628,8 @@ cond_init_arms = list( "ABS"  = 0,
                        "B8"   = as.expression(BM80_init),
                        "B9"   = as.expression(BM90_init),
                        "NB"   = NB0_init  )
+
+# lapply(cond_init_arms, function(x) eval(x))
 ```
 
 
@@ -643,7 +669,6 @@ arm3 = addSampling( arm3, SamplingTimes( outcome = "RespPD",
 arm4 = addSampling( arm4, SamplingTimes( outcome = "RespPK", 
                                          sample_time = c( pk_dense, pk_dense + 6*24, 7*24 + c(4, 24, 48) ), 
                                          initialTime = 0 ) )
-
 arm4 = addSampling( arm4, SamplingTimes( outcome = "RespPD", 
                                          sample_time = c( anc_dense, (2:6)*24, anc_dense + 6*24, 7*24 + c(4, 24, 48, 72) ),                                                                          initialTime = 0 ) )
 
@@ -667,7 +692,6 @@ arm3 = addAdministration( arm3, Administration( outcome = "RespPK", tau = 24, am
 arm4 = addAdministration( arm4, Administration( outcome = "RespPK", tau = 24, amount_dose = c(3) ) )
 arm5 = addAdministration( arm5, Administration( outcome = "RespPK", tau = 24, amount_dose = c(10) ) )
 arm6 = addAdministration( arm6, Administration( outcome = "RespPK", tau = 24, amount_dose = c(30) ) )
-
 MyDesign = Design("MyDesignclozapine")
 MyDesign = addArm( MyDesign, arm1 )
 #MyDesign = addArm( MyDesign, arm2 )
@@ -675,29 +699,24 @@ MyDesign = addArm( MyDesign, arm1 )
 #MyDesign = addArm( MyDesign, arm4 )
 #MyDesign = addArm( MyDesign, arm5 )
 #MyDesign = addArm( MyDesign, arm6 )
-
 #update the project with the design
 MyProject = addDesign( MyProject, MyDesign )
-
 evaluationPop = EvaluatePopulationFIM( MyProject )
 ```
 
 ```{r, echo = FALSE, asis = TRUE}
-
 fim = evaluationPop@designs$MyDesignclozapine@fimOfDesign@mfisher
-
 res = evaluationPop@designs$MyDesignclozapine@concentration$arm1
 
-p = ggplot( res, aes( x = time, y = RespPK  ) ) +
+plotRespPK = ggplot( res, aes( x = time, y = RespPK  ) ) +
   geom_point() +
   geom_line() 
-print( p )
 
-p = ggplot( res, aes( x = time, y = RespPD  ) ) +
+
+plotRespPD = ggplot( res, aes( x = time, y = RespPD  ) ) +
   geom_point() +
   geom_line() 
-print( p )
 
+print( plotRespPK )
+print( plotRespPD )
 ```
-
-
