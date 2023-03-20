@@ -50,7 +50,7 @@ MyProject = PFIMProject( name = "PFIM_model_01" )
 # Create the statistical model
 MyStatisticalModel = StatisticalModel()
 # Need to adjust .relStep for gradient computing
-MyStatisticalModel = setParametersOdeSolver( MyStatisticalModel, list( atol=1e-16, rtol=1e-6, .relStep = 1e-12 ) )
+MyStatisticalModel = setParametersOdeSolver( MyStatisticalModel, list( atol=1e-16, rtol=1e-6) )
 
 ```
 ```{r ModelEquations, echo = FALSE, asis = TRUE}
