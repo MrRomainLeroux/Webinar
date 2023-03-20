@@ -96,7 +96,7 @@ MyStatisticalModel = defineParameter( MyStatisticalModel, pCl )
 ```{r addResponse, echo = FALSE, asis = TRUE}
 # Create and add the responses to the statistical model
 MyStatisticalModel = addResponse( MyStatisticalModel, Response( "RespPK1",
-                                                                Combined1( sigma_inter = 0.05, sigma_slope = 1.0 ) ) )
+                                                                Combined1( sigma_inter = 1.0, sigma_slope = 0.05 ) ) )
 ```
 
 ```{r defineStatisticalModel, echo = FALSE, asis = TRUE}
