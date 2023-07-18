@@ -59,18 +59,20 @@ THETA15 = 3.21E+00  #15
 THETA16 = 3.43E+01  #16
 THETA17 = 3.23E+01  #17
 THETA18 = 0.00E+00  #18
+BAS = 0.0246
+# CP0
+CP0 = quote(BAS)
 
 ##  [MAIN]
 
-# CP0
-CP0 = quote( dose_RespPK )
-
+## POPED
+## notfixed_bpopVector defining if a typical value is fixed or not (1=not fixed, 0=fixed).
 
 pFF = ModelParameter( "FF", 
                        mu = THETA1,
                        omega = sqrt( 0.0 ),
                        fixedMu = TRUE,
-                       fixedOmega = TRUE,
+                       #fixedOmega = TRUE,
                        distribution = LogNormalDistribution() )
 
 pKA = ModelParameter( "KA", 
@@ -323,6 +325,8 @@ NT0 = do.call( 'substitute', list( NT0, list(  BM10 = BM10,
                                                BM70 = BM70,
                                                BM80 = BM80,
                                                BM90 = BM90 ) ) )
+
+
 # AC0
 AC0  = quote( CP0 * VD )
 AC0 = do.call( 'substitute', list( AC0, list( CP0 = CP0 ) ) )
@@ -336,6 +340,7 @@ ADR0  = quote( RTOT0*AC0/(KD+CP0) )
 ADR0 = do.call( 'substitute', list( ADR0, list( RTOT0 = RTOT0,
                                                 AC0 = AC0,
                                                 CP0 = CP0 ) ) )
+
 # KIN 
 KIN  = quote(KEL * AC0 + KINT * ADR0)
 KIN = do.call( 'substitute', list( KIN, list( AC0 = AC0,
@@ -344,11 +349,6 @@ KIN = do.call( 'substitute', list( KIN, list( AC0 = AC0,
 # ATOT 
 ATOT =  quote( CENT )
 
-# ADR
-ADR = quote( RTOT*AC/( KD+CP ) )
-ADR = do.call('substitute', list( ADR, list( RTOT = RTOT,
-                                             AC = AC,
-                                             CP = CP ) ) )
 # NT
 NT = quote( B1+B2+B3+B4+B5+B6+B7+B8+B9+NB )
 
@@ -380,6 +380,11 @@ H2 = do.call('substitute', list( H2, list( CP = CP ) ) )
 H3 = quote(1.0 + SM3 * CP / ( SC1 + CP) )
 H3 = do.call('substitute', list( H3, list( CP = CP ) ) )
 
+# ADR
+ADR = quote( RTOT*AC/( KD+CP ) )
+ADR = do.call('substitute', list( ADR, list( RTOT = RTOT,
+                                             AC = AC,
+                                             CP = CP ) ) )
 ## ---------------------------------------
 ## ODEs
 ## ---------------------------------------
@@ -394,7 +399,7 @@ Deriv_B1 = do.call('substitute', list(Deriv_B1, list( KINB = KINB,
                                                       BM10 = BM10 ) ) )
 
 # Deriv_CENT
-Deriv_CENT = quote( KA * ABS  + KIN - KEL * AC - KINT * ADR )
+Deriv_CENT = quote( KA * FF  + KIN - KEL * AC - KINT * ADR )
 
 Deriv_CENT = do.call('substitute', list( Deriv_CENT, list( AC = AC,
                                                            KIN = KIN,
@@ -506,9 +511,11 @@ MyStatisticalModel = addResponse( MyStatisticalModel, Response( "RespPD",
 ```{r, echo = FALSE, asis = TRUE}
 # Assign the model to the project
 MyProject = defineStatisticalModel( MyProject, MyStatisticalModel )
+
 # -------------------------------------------------
 # initial conditions
 # -------------------------------------------------
+
 # initial values
 VD_init = THETA6 
 KD_init = THETA7
@@ -614,7 +621,7 @@ BM90_init = Simplify(BM90_init)
 
 NB0_init = Simplify(NB0_init)
 
-cond_init_arms = list( "ABS"  = 0.0, 
+cond_init_arms = list( "ABS"  = expression( FF * dose_RespPK ), 
                        "CENT" = as.expression(CENT_init), 
                        "FRR"  = 0.0,
                        "DR"   = 0.0,
