@@ -74,7 +74,7 @@ MyStatisticalModel = defineModelEquations( MyStatisticalModel, MyPKModel)
 ```{r ModelParameters, echo = FALSE, asis = TRUE}
 # Set mu and omega for each parameter
 pka = ModelParameter( "ka", mu = 0.25,
-                      omega = sqrt( 0.08 ),
+                      omega = sqrt( 0.02 ),
                       distribution = LogNormalDistribution() )
 
 pV = ModelParameter( "V", mu = 100,
@@ -82,7 +82,7 @@ pV = ModelParameter( "V", mu = 100,
                      distribution = LogNormalDistribution() )
 
 pCl = ModelParameter( "Cl", mu = 10,
-                      omega = sqrt( 0.2 ),
+                      omega = sqrt( 0.08 ),
                       distribution = LogNormalDistribution() )
 ```
 
@@ -96,7 +96,7 @@ MyStatisticalModel = defineParameter( MyStatisticalModel, pCl )
 ```{r addResponse, echo = FALSE, asis = TRUE}
 # Create and add the responses to the statistical model
 MyStatisticalModel = addResponse( MyStatisticalModel, Response( "RespPK1",
-                                                                Combined1( sigma_inter = 1.0, sigma_slope = 0.05 ) ) )
+                                                                Combined1( sigma_inter = 1.0, sigma_slope = sqrt(0.05 ) ) ) )
 ```
 
 ```{r defineStatisticalModel, echo = FALSE, asis = TRUE}
@@ -115,25 +115,25 @@ design4 = Design("design4")
 ```{r brasTestDesign1, echo = FALSE, asis = TRUE}
 # For each arm create and add the sampling times for each response
 
-brasTestDesign1 = Arm( name="Bras test", arm_size = 12 )
+brasTestDesign1 = Arm( name="Bras test", arm_size = 10 )
 brasTestDesign1 = addSampling( brasTestDesign1, SamplingTimes( outcome = "RespPK1",
                                                            sample_time = c( 1, 24, 48 , 96 ) ) )
 ```
 
 ```{r brasTestDesign2, echo = FALSE, asis = TRUE}
-brasTestDesign2 = Arm( name="Bras test", arm_size = 12 )
+brasTestDesign2 = Arm( name="Bras test", arm_size = 10 )
 brasTestDesign2 = addSampling( brasTestDesign2, SamplingTimes( outcome = "RespPK1",
                                                               sample_time = c( 4, 24, 48 ,96 ) ) )
 ```
 
 ```{r brasTestDesign3, echo = FALSE, include = FALSE}
-brasTestDesign3 = Arm( name="Bras test", arm_size = 12 )
+brasTestDesign3 = Arm( name="Bras test", arm_size = 10 )
 brasTestDesign3 = addSampling( brasTestDesign3, SamplingTimes( outcome = "RespPK1",
                                                               sample_time = c( 6, 24, 48 ,96 ) ) )
 ```
 
 ```{r brasTestDesign4, echo = FALSE, asis = TRUE}
-brasTestDesign4 = Arm( name="Bras test", arm_size = 12 )
+brasTestDesign4 = Arm( name="Bras test", arm_size = 10 )
 brasTestDesign4 = addSampling( brasTestDesign4, SamplingTimes( outcome = "RespPK1",
                                                               sample_time = c( 12, 24, 48 ,96 ) ) )
 ```
