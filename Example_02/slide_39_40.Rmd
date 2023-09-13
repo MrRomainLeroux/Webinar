@@ -32,15 +32,7 @@ line-height: 20px;
 
 </style>
 
-```{r global_options, echo = FALSE, include = FALSE}
-backup_options <- options()
-options(width = 3000)
-knitr::opts_chunk$set(collapse = TRUE,
-comment = "#>",echo = FALSE, warning = FALSE, message = FALSE,
-cache = FALSE, tidy = FALSE, size = "small")
-devtools::load_all()
-```
- 
+
 ```{r, eval=TRUE, asis = TRUE}
 # Create PFIM project
 MyProject = PFIMProject( name = "PFIM_model_01" )
